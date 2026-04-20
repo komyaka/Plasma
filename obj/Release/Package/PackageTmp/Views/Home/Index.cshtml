@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Просмотр выданых программ";
+}
+<h4>@ViewBag.Name</h4>
+<div class="row over-table">
+    <div class="col-sm-6">
+        <form class="fh">
+            @{ if (ViewBag.CB1 == "")
+                {<input type='checkbox' id='cb1' onchange='showOrHide("cb1");' /><span>Отобразить готовые&nbsp; &nbsp; &nbsp; &nbsp;</span>
+                }
+                else
+                {<input type='checkbox' id='cb1' onchange='showOrHide("cb1");' checked /><span>Отобразить готовые&nbsp; &nbsp; &nbsp; &nbsp;</span>
+                }
+            }
+            <input type='checkbox' id='cb2' onchange='showOrHide("cb2");' checked />отобразить неготовые
+        </form>
+    </div>
+    <div class="col-sm-6">
+        <input class="form-control" id="myInput" type="text" placeholder="Найти по имени..">
+        <input hidden id="sor" value="@ViewBag.SORT">
+    </div>
+</div>
+@if (((ViewBag.User.Privilegies & 32768) != 0))
+{
+    <div class="row">
+        <form action="~/adr/newCNC2" method="post" enctype="multipart/form-data">
+            <input name="uploads" type="file" multiple /><input type="submit" />
+        </form>
+    </div>
+}
+<table>
+    <thead>
+        <tr>
+            <th class="sorted" onclick="document.location.replace('?SORT=ID&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">№ </th>
+            <th class="sorted" onclick="document.location.replace('?SORT=NAME&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">файл</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=TICKNESS&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">толщина</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=QTY&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">кол-во</th>
+            <th>вырезано</th>
+            <th>время<br>производства</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @{
+            int ogg = 1;
+            int oggh = 1;
+            int fulltime = 0;
+            int rtime = 0;
+            int countall = 0;
+            int countr = 0;
+            float ktime = 1;
+            int s = 0;
+            foreach (var x in ViewBag.CNCs)
+            {
+
+                fulltime += x.RunTimeAll * 2;
+                countall++;
+                s++;
+                var ts = TimeSpan.FromSeconds((int)@x.RunTimeOneSheet * ktime);
+                string fn = x.FileName.Substring(x.FileName.LastIndexOf("\\") + 1, x.FileName.LastIndexOf(".") - x.FileName.LastIndexOf("\\") - 1);
+                if (x.Quantity <= x.QuantityDone)
+                {
+                    oggh = 1 - oggh;
+                    <tr class="hiddenrow_@oggh">
+                        <td>
+                            @x.Id
+                            @if ((ViewBag.User.Privilegies & 32768) != 0)
+                            {
+                                <a><img src="~/img/ERR.jpg" width="15px" height="15px" onclick="delcnc(@x.Id,lr)"></a>
+                            }
+                        </td>
+                        <td class="l">
+                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')"> @fn</div>
+                            <div id="mymnu_@x.Id" class="vis"><a href="~/Home/PartsList?CNCID=@x.Id" class="l">Список деталей</a><br><a id="Canva_@x.Id"></a><canvas id="canva_@x.Id" class="mycanva"></canvas></div>
+                        </td>
+                        <td>@x.tickness</td>
+                        <td>@x.Quantity</td>
+                        <td>@x.QuantityDone</td>
+                        <td>@ts.Hours:@ts.Minutes:@ts.Seconds</td>
+                    </tr>
+                }
+                else
+                {
+                    ogg = 1 - ogg;
+                    countr++;
+                    rtime += (x.Quantity - x.QuantityDone) * x.RunTimeOneSheet;
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>
+                            @x.Id
+                            @if ((ViewBag.User.Privilegies & 32768) != 0)
+                            {
+                                <a><img src="~/img/ok.jpg" width="15px" height="15px" onclick="donecnc(@x.Id,ld)"></a>
+                                <a><img src="~/img/ERR.jpg" width="15px" height="15px" onclick="delcnc(@x.Id,lr)"></a>
+                            }
+                        </td>
+                        <td class="l">
+                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')">@fn</div>
+                            <div id="mymnu_@x.Id" class="vis"><a href="~/Home/PartsList?CNCID=@x.Id" class="l">Список деталей</a><br><a id="Canva_@x.Id"></a><canvas id="canva_@x.Id" class="mycanva"></canvas></div>
+                        </td>
+                        <td>@x.tickness</td>
+                        <td>@x.Quantity</td>
+                        <td>@x.QuantityDone</td>
+                        <td>@ts.Hours:@ts.Minutes:@ts.Seconds</td>
+                    </tr>
+                }
+            }
+        }
+        <tr>
+            @{var tsr = TimeSpan.FromSeconds((int)rtime * ktime); }
+            <td>Всего</td>
+            <td>@countall программ</td>
+            <td></td>
+            <td> @countr в работе</td>
+            <td></td>
+            <td>@(tsr.Days * 24 + tsr.Hours):@tsr.Minutes:@tsr.Seconds</td>
+        </tr>
+
+    </tbody>
+</table>
+<script>
+    window.addEventListener('load', function() {let timerId = setInterval(checkUpdate, 18000);})
+    // остановить вывод через 5 секунд
+    // Очистить проверку обновлений (когда есть подтверждение что информация устарела)
+    function checkUpdate()
+    {
+
+        xmlRequest.open("POST", '@Url.RouteUrl(new { controller = "Home", action = "CheckUpdateTable", tablename = "CNCFILES" })');
+        xmlRequest.onreadystatechange = checkupdaterequest;
+        xmlRequest.send(null);
+    }
+    function visual(cncid, canvaid) {
+    currentcanva = canvaid;
+    MyRequest('@Url.RouteUrl(new { controller = "Home", action = "getIMAGE", cncID = " "})' + cncid, readshowcnc);
+}
+    showOrHide("cb1");
+
+</script>
+@if ((ViewBag.User.Privilegies & 32768) != 0)
+{
+    <script>
+        var ld = '@Url.RouteUrl(new { controller = "adr", action = "DoneCNC", ID = " "})';
+        var lr = '@Url.RouteUrl(new { controller = "adr", action = "DelCNC", ID = " "})';
+    </script>
+    @Scripts.Render("~/Scripts/admtools.js")
+}

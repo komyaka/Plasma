@@ -1,0 +1,267 @@
+﻿
+@{
+    ViewBag.Title = "Ввод исходных данных";
+}
+<h2>ввод данных для расчета</h2>
+<div class="container">
+    <div id="NewData">
+        <div class="row">
+            <div class="col-sm-3 bg-secondary">
+                <h3>размеры проката</h3>
+                <button>
+                    загрузить из файла
+                </button>
+                <p>добавить с клавиатуры</p>
+                <input type="number" class="numInput" v-model="storageInput" v-on:keyup.enter="addiS" v-bind:title="titles[0]" />
+                <button v-on:click="addiS">добавить</button>
+                <div style="width:200px" class="mg-5" v-bind:style="(storageCompressed.length<10)?{overflow:'hidden'}:{overflow:'visible'}">
+                    <div style="width:217px;height:320px;overflow-y:scroll;">
+                        <ol class="list-group" v-bind:title="titles[1]">
+                            <li class="list-group-item" v-for="(L,index) in storageCompressed" v-on:contextmenu="strbm($event,storage,L.len)">{{L.len}}X{{L.quantity}} шт.</li>
+                        </ol>
+                    </div>
+                    <button v-on:click="clear(storage)">Очистить список</button>
+                </div>
+            </div>
+            <div class="col-sm-1"></div>
+            <div class="col-sm-4 bg-secondary">
+                <h3>размеры заготовок</h3>
+                <button>
+                    загрузить из файла
+                </button>
+                <p>добавить с клавиатуры</p>
+                <input type="number" class="numInput" v-model="partInput" v-on:keyup.enter="addPart" v-bind:title="titles[2]" />
+                <button v-on:click="addPart">добавить</button>
+                <input type="number" class="qtyInput" v-model="partQTY" v-on:keyup.enter="addPart" v-bind:title="titles[3]" />
+                <span>шт.</span>
+                <div style="width:200px" class="mg-5" v-bind:style="(partsCompressed.length<10)?{overflow:'hidden'}:{overflow:'visible'}">
+                    <div style="width:217px;height:320px;overflow-y:scroll;">
+                        <ol class="list-group" v-bind:title="titles[1]">
+                            <li class="list-group-item" v-for="(L,index) in partsCompressed" v-on:contextmenu="strbm($event,parts,L.len)">{{L.len}}X{{L.quantity}} шт.</li>
+                        </ol>
+                    </div>
+                    <button v-on:click="clear(parts)">Очистить список</button>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <p>Ширина реза:</p>
+                <input type="number" class="numInput" v-model="cutOffData" v-bind:title="titles[4]" /><br/>
+                <button v-on:click="toserv">РАССЧИТАТЬ</button>
+            </div>
+        </div>
+        <hr>
+        <div class="row" id="solution" name="solution">
+            <div class="col-sm-3">
+                <table class="table-bordered table-striped CutSaw">
+                    <tbody>
+                        <tr v-for="(sol,index) in solve" v-if="sol[2]>0">
+                            <td class="lineHead">{{index+1}})длинна хлыста {{sol[0]}},<br>отсаток {{sol[1]}}<br>(количество {{sol[2]}})</td>
+                            <td v-for="(s,index) in sol" v-if="index>2">{{s}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    // print(A,w,s,n) A - входной рассчитанный массив [кол-во отрезков,вместимость рюкзака], 
+    //                w - массив длин элементов [отрезки]
+    //                s - количество отрезков (=w.length)
+    //                n - к - максимальная длинна отрезка = вес рюкзака (или =A.length)
+    // рекурсивно получает список входящих в рюкзак элементов и складывает индексф этих элементов в массив z[] 
+    // не возвращает ничего, результатом работы является набранный массив z[]
+    function Print(A, w, s, n, cutWidth)
+     {
+     if (!A[s][n]) return; // максимальный рюкзак для параметров (s,n)
+     // имеет нулевую ценность,
+     // поэтому ничего не выводим
+     else if (A[s - 1][n] == A[s][n]) Print(A, w, s - 1, n, cutWidth); // можно составить рюкзак без предмета s
+     else {
+     z.push(s-1);
+     Print(A, w, s - 1, n - (w[s - 1] + cutWidth), cutWidth); // Предмет s должен обязательно
+     return
+     // войти в рюкзак
+     //Возвращается строка с индексами предметов, индексы разделены пробелами.
+     }
+     }     //solveone(w,len)  w - входной массив отрезков,
+     //                 len - вместительность рюкзака,
+     // вычисляет расчётный массив и передаёт его в Print для выборки результатов.
+     function solveone(w,len)
+     {
+     z = [];
+     let cutWidth = +getData.cutOffData;
+     z[0] = len;// Очистить результаты;
+     let W = w.length; //[количество строк]
+     let k = -(- cutWidth-len) ; // количество столбцов
+     let A=[]; //A[строка][столбец]
+     for(i=0;i<=W;i++)
+     {A.push([]);
+     for(j=0;j<=k;j++) A[i].push();
+     }
+     // let A=[W+1]; // количество столбцов равно максимальному весу
+     // for (i=0;i<=W;i++) A[i]=[k+1];
+     for (n = 0; n <= k; n++) { A[0][n] = 0;} // Заполняем нулевую строчку
+ 
+     for(s=1;s<=W;s++) // s - максимальный номер предмета,
+     { // который можно использовать
+     for(n=0;n<=k;n++) // n - вместимости рюкзака
+     {
+     A[s][n]=A[s - 1][n];
+     if ((n >= (w[s - 1]+cutWidth)) && (A[s - 1][n - (w[s - 1] + cutWidth)] + w[s - 1] > A[s][n]))
+         A[s][n] = A[s - 1][n - (w[s - 1] + cutWidth)] + w[s - 1];
+     }
+     }
+     Print(A, w, W, k, cutWidth);
+     return z;
+     }
+     var getData = new Vue
+     ({
+     el: '#NewData',
+     data:
+     {
+     storageInput: "",
+     solve:[],  //0 элемент - длинна хлыста, 1 элемент остаток после разделки 2 элемент количество таких хлыстов.
+     storage: [],
+     storageCompressed:[],
+     parts: [],
+     partsCompressed:[],
+     partInput: "",
+     cutOffData: 3,
+     partQTY:1,
+     titles: [
+         'здесь нужно вводить длинну хлыстов металлопроката, которые хранятся на складе, для ввода можно нажать ENTER',
+         'можно выборочно удалить любой элемент списка, нажав на нём правую клавишу мыши',
+         'здесь нужно вводить длины заготовок, для ввода можно нажать ENTER',
+         'здесь можно изменить количество заготовок <br>которые нужно добавить в список',
+         'введите ширину реза',
+     ]
+         },
+     mounted: function () {
+         $$ = this;
+         $$.addToList(this.storage,2000, 7);
+         $$.addToList(this.parts,510, 7);
+         $$.addToList(this.parts,170, 60);
+         $$.addToList(this.parts,280, 54);
+         $$.addToList(this.parts,365, 36);
+         $$.addToList(this.parts,260, 36);
+     },
+     methods: {
+         compressParts: function (a)
+             {
+                 let p = a.sort(function (a, b) {return b - a }).slice();
+             let compPatrts = [];
+             let count = 1;
+             while (p.length>0)
+             {
+                count = 1;
+                 while (p[count] == p[0]) count++;
+                 compPatrts.push({ len: p[0], quantity: count });
+                 p.splice(0, count);
+             }
+             return compPatrts;
+         },
+         clear(arr)
+         {
+             if (arr == this.storage) {
+                 this.storage = []; this.storageCompressed = [];
+             }
+             if (arr == this.parts) { this.parts = []; this.partsCompressed = []; }
+         },
+         addToList(arr, _Length, _Quantity)
+         {
+            for (i = 0; i < _Quantity; i++) { arr.push(+_Length); }
+             if (arr == this.storage) this.storageCompressed = this.compressParts(this.storage);
+             if (arr == this.parts) this.partsCompressed = this.compressParts(this.parts);
+         },
+         addInStorage: function(_Length, _Quantity)
+         {
+            for (i = 0; i < _Quantity; i++) { this.storage.push(+_Length); }
+            this.storageCompressed = this.compressParts(this.storage);
+         },
+         addiS: function ()
+         {
+             if (this.storageInput != '') {
+             this.storage.push(+this.storageInput)
+             }
+         this.storageCompressed = this.compressParts(this.storage);
+         },
+         addParts: function (_Length, _Quantity)
+         {
+             for (i = 0; i < _Quantity; i++)
+             this.parts.push(+_Length);
+             this.partsCompressed = this.compressParts(this.parts);
+     },
+     addPart: function ()
+     {
+         if (this.partInput != '') 
+                 this.addParts(+this.partInput,this.partQTY);
+     },
+     storageSort: function (){this.storage.sort(function (a, b) { return a - b;})},
+     partsSort: function () { this.parts.sort(function (a, b) { return a - b; }) },
+     toserv:function()
+     {
+        let arr=[0,0];
+        this.solve=[];
+        this.storageSort();
+        this.parts.sort(function (a, b) { return b - a; });
+        while((this.parts.length>0)&&(this.storage.length>0)&&(arr.length>0))
+        {
+        arr=solveone(this.parts, this.storage[0]);
+        this.solve.push([]);
+        this.solve[this.solve.length-1].push(this.storage[0]);
+        this.solve[this.solve.length - 1].push(this.cutOff(arr));
+        this.solve[this.solve.length - 1].push(1);
+        this.storage.splice(0,1);
+        for(k=1;k<arr.length;k++) this.solve[this.solve.length-1].push(this.parts[arr[k]]);
+        for (k = 0; k < arr.length; k++) this.parts.splice(arr[k], 1);
+         }
+
+        this.joinResults();
+        this.solve.sort(
+            function (b, a) {
+                if (a[2] != b[2]) return a[2] - b[2];
+                if (a[1] != b[1]) return b[1] - a[1];
+                return a.length - b.length;
+            })
+        this.storageCompressed = this.compressParts(this.storage);
+        this.partsCompressed = this.compressParts(this.parts);
+        location.href = '#solution';
+         },
+         strbm: function (event, arr, index) {
+             if (event.which == 3) {
+                 arr.splice(arr.findIndex((x) => (x == index)), 1);
+                 if (arr == this.parts) this.partsCompressed = this.compressParts(this.parts);
+                 if (arr == this.storage) this.storageCompressed = this.compressParts(this.storage);
+             }
+             event.preventDefault();
+         },
+     cutOff:function(a)
+     {
+        let cut_off = a[0]/1 +this.cutOffData/1;
+        for(i=1;i<a.length;i++)
+            cut_off -=( this.parts[a[i]] + this.cutOffData/1);
+        return cut_off;
+     },
+     compareResult:function (a,b)
+     {
+         if (a.length != b.length) return false;
+         for (_i = 3; _i < a.length;_i++){if (a[_i]!=b[_i])return false;}
+         return true;
+     },
+     joinResults: function ()
+     {
+         this.solve.sort(function (a, b) { return (a.length > b.length) ? -1 : 1 });
+         for(i=0;i<this.solve.length-1;i++)
+             for(j=i+1;j<this.solve.length;j++)
+                 if ((this.solve[i][2] > 0) &&
+                     (this.solve[j][2] > 0) &&
+                     (this.compareResult(this.solve[i], this.solve[j])))
+                 { this.solve[i][2] += this.solve[j][2]; this.solve[j][2] = 0; }
+     },
+}
+});
+</script>
+
+

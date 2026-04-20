@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = ViewBag.Fname;
+}
+<h4>Данные по расчету заказа</h4><h3> @ViewBag.Fname</h3>
+<dv id="finance">
+    <table id="partShipOrderTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Деталь</th>
+                <th>Толщина</th>
+                <th>Длинна</th>
+                <th>Ширина</th>
+                <th>Количество</th>
+                <th>Стоимость</th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @{
+                int allquantity = 0;
+                int allcost = 0;
+            }
+            @foreach (var x in ViewBag.FinParts)
+            {
+                <tr>
+                    @{ allcost += x.cost * x.QuantitySummary;
+                        allquantity += x.QuantitySummary;}
+                    <td>@x.Id</td>
+                    <td>@x.Name</td>
+                    <td>@x.tickness</td>
+                    <td>@x.Size_X</td>
+                    <td>@x.Size_Y</td>
+                    <td>@x.QuantitySummary</td>
+                    <td>@x.cost</td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td>Итого</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@allquantity</td>
+                <td>@allcost</td>
+            </tr>
+        </tbody>
+    </table>
+</dv>
+

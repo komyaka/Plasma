@@ -1,0 +1,114 @@
+﻿
+@{
+    ViewBag.Title = "Просмотр листов";
+}
+
+<h4>Учет листов</h4>
+Целые листы на складе:
+<br />
+<form>
+    <input type='checkbox' id='cb1' onchange='showOrHide("cb1");' />Показывать начатые
+    <br />
+    Сортировать по :
+    <select name="SORT">
+        @{
+            if (@ViewBag.SORT == "ID")
+            {
+                <option selected value="ID">Умолчанию</option>
+            }
+            else
+            {
+                <option value="ID">Умолчанию</option>
+            }
+            if (@ViewBag.SORT == "STEEL")
+            {
+                <option selected value="STEEL">Материал</option>
+            }
+            else
+            {
+                <option value="STEEL">Материал</option>
+            }
+            if (@ViewBag.SORT == "TICKNESS")
+            {
+                <option selected value="TICKNESS">Толщине</option>
+            }
+            else
+            {
+                <option value="TICKNESS"> Толщине </option>
+            }
+            if (@ViewBag.SORT == "SIZE")
+            {
+                <option selected value="SIZE">размеру</option>
+            }
+            else
+            {
+                <option value="SIZE">размеру</option>
+            }
+        }
+    </select>
+    &nbsp;
+    <input type="submit" value="Применить" />
+</form>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Марка</th>
+                <th>толщина</th>
+                <th>ширина</th>
+                <th>высота</th>
+                <th>кол-во</th>
+                <th>Программа/<br />владелец</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int ogg = 1;
+                int oggh = 1;
+                foreach (var x in ViewBag.Sheets)
+                {
+                    if (x.Name == "")
+                    {
+                        ogg = 1 - ogg;
+                        <tr class="alwaysshowrow_@ogg">
+                            <td>@x.Id</td>
+                            <td>@ViewBag.m[x.Matherial]</td>
+                            <td>@x.Tickness</td>
+                            <td>@x.Width</td>
+                            <td>@x.Heigth</td>
+                            <td>@x.Quantity</td>
+                            <td>@x.Owner</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        ogg = 1 - ogg;
+        <tr class="hiddenrow_@ogg">
+            <td>@x.Id</td>
+            <td>@ViewBag.m[x.Matherial]</td>
+            <td>@x.Tickness</td>
+            <td>@x.Width</td>
+            <td>@x.Heigth</td>
+            <td>@x.Quantity</td>
+            <td>@x.Name</td>
+            <td> @x.Document ( @x.Date.ToString("dd-MMMM-yy") );</td>
+        </tr>
+                    }
+                }
+
+            }
+        </tbody>
+    </table>
+    <p>На 1 стадии разработки</p>
+    <script>
+    showOrHide("cb1");
+    window.addEventListener('load', function() {let timerId = setInterval(checkUpdate, 18000);})
+    function checkUpdate()
+    {
+        xmlRequest.open("POST", "CheckUpdateTable?tablename=SHEETS");
+        xmlRequest.onreadystatechange = checkupdaterequest;
+        xmlRequest.send(null);
+    }
+    function syncro() { }
+</script>

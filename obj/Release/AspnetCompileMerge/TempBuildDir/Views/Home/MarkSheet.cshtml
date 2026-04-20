@@ -1,0 +1,158 @@
+﻿
+@{
+    ViewBag.Title = "Управление листами";
+}
+
+<h4>Учет листов</h4>
+Целые листы на складе:
+<br />
+<form>
+    <input type='checkbox' id='cb1' onchange='showOrHide("cb1");' />Показывать начатые
+    <br />
+    Сортировать по :
+    <select name="SORT">
+        @{
+            if (@ViewBag.SORT == "ID")
+            {
+                <option selected value="ID">Умолчанию</option>
+            }
+            else
+            {
+                <option value="ID">Умолчанию</option>
+            }
+            if (@ViewBag.SORT == "STEEL")
+            {
+                <option selected value="STEEL">Материал</option>
+            }
+            else
+            {
+                <option value="STEEL">Материал</option>
+            }
+            if (@ViewBag.SORT == "TICKNESS")
+            {
+                <option selected value="TICKNESS">Толщине</option>
+            }
+            else
+            {
+                <option value="TICKNESS"> Толщине </option>
+            }
+            if (@ViewBag.SORT == "SIZE")
+            {
+                <option selected value="SIZE">размеру</option>
+            }
+            else
+            {
+                <option value="SIZE">размеру</option>
+            }
+        }
+    </select>
+    &nbsp;
+    <input type="submit" value="Применить" />
+</form>
+<form action="#" method="post" onsubmit="return submallstr()">
+<table>
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Программа</th>
+            <th>толщина</th>
+            <th>ширина</th>
+            <th>высота</th>
+            <th>кол-во</th>
+            <th>выбрать листы</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int ogg = 1;
+            foreach (var x in ViewBag.CNC)
+            {
+                int count = 0;
+                foreach (var Y in ViewBag.Sheets)
+                {
+                    if ((x.Material==Y.Matherial)&&(Y.Tickness == (float)Convert.ToDouble(x.tickness.Replace(".", ","))) && (((int)Y.Width / 50) * 50 == ((int)x.SheetWidth / 50) * 50) && (((int)Y.Heigth / 50) * 50 == ((int)x.SheetHeigh / 50) * 50)) { count++; }
+                }
+                ogg = 1 - ogg;
+                if ((x.FileName.IndexOf("(N") < 0) && (count != 0))
+                {
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>@x.Id</td>
+                        <td>
+                            
+                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')">@x.FileName</div>
+                            <div id="mymnu_@x.Id" class="vis"><br><a id="Canva_@x.Id"></a><canvas id="canva_@x.Id" class="mycanva"></canvas></div>
+                                            </td>
+                        <td>@x.tickness</td>
+                        <td>@x.SheetWidth</td>
+                        <td>@x.SheetHeigh</td>
+                        <td>@x.Quantity</td>
+                        <td>@for(int i=x.Quantity;i>0;i--){
+                            <a  id="Cell_@x.Id-@i"> </a>
+                            <select id="sizesel_@x.Id-@i" name="Size" onchange="Seleсtfield" class="cnc_sheet">
+                                <option value='@x.Id:-1'>Не отмечать</option>
+                                <option value='@x.Id:-7'>Программа без листа</option>
+                                @{ 
+                                    foreach (var Y in ViewBag.Sheets)
+                                    {
+                                        if ((x.Material == Y.Matherial) && (Y.Tickness == (float)Convert.ToDouble(x.tickness.Replace(".", ","))) && (((int)Y.Width / 50) * 50 == ((int)x.SheetWidth / 50) * 50) && (((int)Y.Heigth / 50) * 50 == ((int)x.SheetHeigh / 50) * 50))
+                                        {
+                                            <option value='@x.Id:@Y.Id'>(@ViewBag.m[Y.Matherial]) @Y.Tickness x @Y.Width x @Y.Heigth [id=@Y.Id]</option>
+                                           
+                                        }
+                                    }
+                                  }
+                            </select>
+                            if (x.Quantity > 0) { <br>}
+                             }
+                        </td>
+                    </tr>
+                }
+            }
+
+        }
+    </tbody>
+</table>
+    <input type="submit" />
+ </form>
+<script>
+   function syncroField() { }
+    async function subm1str(cncid, sheetid,IdOption) {
+        try {
+            let response = await fetch('MarkSheet2?cncId=' + cncid + '&sheetId=' + sheetid);
+            response = await response.json();
+        
+            if (response.result == true) {
+                let selID = "sizesel_" + response.cncid + '-' + IdOption.split('-')[1];
+                let celID = selID.replace('sizesel_','Cell_')
+                document.getElementById(celID).innerHTML = document.getElementById(selID).options[document.getElementById(selID).options.selectedIndex].text;
+                document.getElementById(selID).style.display = "none";
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+    Seleсtfield()
+    {
+        // Здесь разместить код  если выбран какой либо ID  то нужно скрыть все остальные options  с этим id
+        // но пока не понятно как сделать  deselect ( показать все options если снят выбор )
+    }
+    function submallstr()
+    {
+        var allposition = document.getElementsByClassName('cnc_sheet')
+        for (i = 0; i < allposition.length; i++)
+        {
+            subm1str(allposition[i].value.split(':')[0], allposition[i].value.split(':')[1], allposition[i].id);
+        }
+        return false;
+    }
+    function visual(cncid,canvaid)
+    {
+        currentcanva = canvaid
+        xmlRequest.open("POST", "getIMAGE?cncID=" + cncid);
+        xmlRequest.onreadystatechange = readshowcnc;
+        xmlRequest.send(null);
+    }
+
+</script>
+

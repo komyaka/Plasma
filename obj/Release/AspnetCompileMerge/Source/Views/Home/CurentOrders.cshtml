@@ -1,0 +1,90 @@
+﻿<link rel="stylesheet" type="text/css" href="~/Content/cssworld.ru-xcal.css" />
+<script type="text/javascript" src="~/Scripts/cssworld.ru-xcal.js"></script>
+<input type='hidden' id='cb1' onchange='showOrHide("cb1");' checked />
+@{
+    ViewBag.Title = "Заказы в работе:";
+}
+<div class="row over-table">
+    <div class="col-sm-6">
+        <span>заказы с :</span>
+        <form>
+            <input type="text" name="date" value="@ViewBag.now" size="19" onClick="xCal(this)" onKeyUp="xCal()">
+            <input id="Patternaply" type="submit" value="Применить" />
+        </form>
+    </div>
+    <div class="col-sm-6">
+        <input class="form-control" id="myInput" type="text" placeholder="Найти по имени..">
+    </div>
+</div>
+<h4>Заказы в работе:</h4>
+<table>
+    <thead>
+        <tr>
+            <th class="sorted">Заказ</th>
+            <th class="sorted">Выдано в работу<br>деталей</th>
+            <th class="sorted">нарезано</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @{
+            int ogg = 1;
+            int oggh = 1;
+            string fn = "";
+            foreach (var x in ViewBag.orders)
+            {
+
+                fn = "Parts?_Name=" + x.Name + "&minwidth=&maxwidth=&minheigth=&maxheigth=&SORT=ID&hdone=on&hcute=on";
+                if (x.all > x.cutted)
+                {
+                    ogg = 1 - ogg;
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>
+                            <div onclick="showSubMNU('m_@x.Name')">@x.Name</div>
+                            <div id="m_@x.Name" class="vis">
+                                <div><a href="@fn">Список деталей</a></div>
+                                @if ((ViewBag.User.Privilegies & ViewBag.chapters_calculation) != 0){<div><a href="Calculation?Name=@x.Name">Показать расчет</a></div>}
+                                @if ((ViewBag.User.Privilegies & ViewBag.chapters_ShipManaged) != 0){<div>@Html.ActionLink("Частичная отгрузка", "PartialShip", "SHIPMENT", new { Name = x.Name }, null)</div>}
+                            </div>
+                        </td>
+                        <td>@x.all</td>
+                        <td>@x.cutted</td>
+                    </tr>
+                }
+                else
+                {
+                    oggh = 1 - oggh;
+                    <tr class="hiddenrow_@oggh">
+                        <td>
+                            <div onclick="showSubMNU('m_@x.Name')">@x.Name</div>
+                            <div id="m_@x.Name" class="vis">
+                                <div><a href="@fn">Список деталей</a></div>
+                                @if ((ViewBag.User.Privilegies & ViewBag.chapters_calculation) != 0)
+                                {<div><a href="Calculation?Name=@x.Name">Показать расчет</a></div>}
+                                @if ((ViewBag.User.Privilegies & ViewBag.chapters_ShipManaged) != 0)
+                                {
+                                    <div>@Html.ActionLink("Отгрузить полностью", "ApplyShip", "SHIPMENT", new { Name = x.Name }, null)</div>
+                                    <div>@Html.ActionLink("Частичная отгрузка", "PartialShip", "SHIPMENT", new { Name = x.Name }, null)</div>
+                                }
+                            </div>
+                        </td>
+                        <td>@x.all</td>
+                        <td>@x.cutted</td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
+<a href="#" class="back-to-top"></a>
+<script>
+    showOrHide("cb1");
+    window.addEventListener('load', function() {let timerId = setInterval(checkUpdate, 18000);})
+    function checkUpdate()
+    {
+        xmlRequest.open("POST", "CheckUpdateTable?tablename=PARTS");
+        xmlRequest.onreadystatechange = checkupdaterequest;
+        xmlRequest.send(null);
+    }
+    function syncro() { }
+</script>
+

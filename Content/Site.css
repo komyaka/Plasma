@@ -1,0 +1,109 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    /*
+    background-image: url("../img/12.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: right,bottom;
+    background-size: 100% auto;
+    */
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.fh {
+    /* background-image: url("../img/1.jpg");*/
+}
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+fav
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+table {
+    align-self: center;
+    justify-content: center;
+    width:100%;
+    border-spacing:20px;
+}
+tbody {
+    width :100%;
+    border-spacing: 20px;
+}
+.vis
+{
+    /*width:1200px;
+    height:720px;
+    */
+    display:none;
+}
+
+canvas {
+    width: 600px;
+    height: 200px;
+    display: none;
+}
+
+.mycanva {
+    width: 630px;
+    height: 220px;
+    display: none;
+    
+}
+.back-to-top {
+    position: fixed;
+    right: 10px;
+    bottom: 100px;
+    width: 50px;
+    height: 50px;
+    border-color: transparent;
+    border-radius: 50px;
+    background-color: gray;
+    display: none;
+}
+#Currenttime {
+    justify-content:right;
+}
+#ncinfo p {
+    line-height: 50%;
+}
+input, select {
+    margin: 4px
+}
+#bottomlogo {
+    color: white;
+    padding: 0px;
+    margin-top: 15px;
+}
+svg {
+    stroke-width: 1.2;
+    stroke: green;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill-rule: none-zero;
+    fill: Yellow;
+    fill-opasity: 0.2;
+}
+.modalsheet {
+    margin-left:30px;
+    margin-top:50px;
+}
+.formEditSheetArrival {
+    margin-left:25px;
+}
+a.Aboutlink {
+    font-weight: 800;
+    font-size: 13px;
+    text-shadow: 2px 2px 3px lightblue;
+}

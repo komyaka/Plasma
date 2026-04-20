@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "NewSheet2";
+}
+
+<h2>NewSheet2</h2>
+
+добавлено:
+<br>
+<p>
+    @ViewBag.q листов <br>
+    марка стали:@ViewBag.mt[ViewBag.sh.Matherial]<br>
+    размер @(ViewBag.sh.Width)x@(ViewBag.sh.Heigth)<br>
+</p>
+перенаправление на форму добавления листа через 3 сек
+<script>
+    setTimeout('location.replace("NewSheet")', 3000);
+</script>

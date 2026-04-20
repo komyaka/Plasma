@@ -1,0 +1,48 @@
+﻿<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("PLASMA", "About", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                @if (((ViewBag.User.Privilegies & 2) != 0))
+                {
+                    <li>@Html.ActionLink("Программы", "Index", "Home")</li>
+                }
+                }
+                @if (((ViewBag.User.Privilegies & 4) != 0))
+                {
+                    <li>@Html.ActionLink("Детали", "Parts", "Home")</li>
+                }
+                @if (((ViewBag.User.Privilegies & 56) != 0))
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Листы</a>
+                        <div class="dropdown-menu">
+                            @if ((ViewBag.User.Privilegies & 8) != 0)
+                            {@Html.ActionLink("Просмотр листов", "Sheets", "Home", null, new { @class = "dropdown-item" })}
+                            @if ((ViewBag.User.Privilegies & 16) != 0)
+                            {@Html.ActionLink("Добавить листы", "NewSheet", "Home", null, new { @class = "dropdown-item" });}
+                            @if ((ViewBag.User.Privilegies & 16) != 0)
+                            {@Html.ActionLink("Приходы металла", "SheetsArrival", "Home", null, new { @class = "dropdown-item" });}
+                            @if ((ViewBag.User.Privilegies & 32) != 0)
+                            {@Html.ActionLink("Отметить порезанные", "MarkSheet", "Home", null, new { @class = "dropdown-item" });}
+                        </div>
+                    </li>
+}
+                @if ((ViewBag.User.Privilegies & 64) != 0)
+                {<li>@Html.ActionLink("Заказы", "CurentOrders", "Home")</li>}
+                @if ((ViewBag.User.Privilegies & 128) != 0)
+                {<li>@Html.ActionLink("Отгрузки", "ViewShip", "SHIPMENT")</li>}
+                @if ((ViewBag.User.Privilegies & 32768) != 0)
+                {<li>@Html.ActionLink("Пила", "CutSaw", "CutSaw")</li>}
+                </ul>
+        </div>
+    </div>
+</div>
+

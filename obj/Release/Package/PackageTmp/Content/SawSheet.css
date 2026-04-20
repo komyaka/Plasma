@@ -1,0 +1,36 @@
+﻿body {
+}
+
+.list-group-item {
+padding:5px 7px;
+}
+button {
+margin:5px;
+}
+.mg-5
+{
+    margin:5px;
+    width:200px
+}
+.lenlist {
+margin:5px;
+width:217px;
+height:320px;
+overflow-y:scroll;
+}
+.numInput{
+    margin:5px;
+    width:6em;}
+.qtyInput{
+    margin:5px;
+    width:4em;
+}
+.CutSaw td {
+    padding: 0 15px 0 15px;
+    font-size: 1.2em;
+}
+
+.lineHead {
+    font-size: 1em;
+    padding: 10px 5px;
+}

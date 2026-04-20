@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "Отметка выполнения";
+
+    if ((@ViewBag.found!=null)&&(@ViewBag.found))
+    {
+        string fn = ViewBag.CNC.OriginalName.Substring(ViewBag.CNC.OriginalName.LastIndexOf("\\") + 1,ViewBag.CNC.OriginalName.LastIndexOf(".")-ViewBag.CNC.OriginalName.LastIndexOf("\\")-1);
+        <h2>@fn</h2>
+        <form>
+            <input id="Text1" type="text" />
+            <input id="B1" type="submit" value="Отметить выполнение" />
+        </form>
+    }
+    else
+    {
+        <h1> Программа в БД отсутствует</h1>
+    }
+
+}

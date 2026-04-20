@@ -1,0 +1,279 @@
+﻿@{
+    ViewBag.Title = "Просмотр деталей";
+}
+<div class="row over-table">
+<div class="col-sm-6">
+<form>
+    @{
+        if (@ViewBag.hdone)
+        {<input type='checkbox' id='cb1' onchange='showOrHide("cb1");' checked />}
+        else
+        {<input type='checkbox' id='cb1' onchange='showOrHide("cb1");' />}
+    }
+    <span>Отобразить готовые</span>
+    @{
+        if (@ViewBag.hcute)
+        {<input type='checkbox' id='cb2' onchange='showOrHide("cb2");' checked />}
+        else
+        {<input type='checkbox' id='cb2' onchange='showOrHide("cb2");' />}
+    }
+    <span>отобразить неготовые</span>
+    <br>
+    <span>Сортировать по :</span>
+    <select id="sort" name="SORT" onchange="syncro();">
+        @{
+            if (@ViewBag.SORT == "ID")
+            {
+                <option selected value="ID">Идентификатору</option>
+            }
+            else
+            {
+                <option value="ID">Идентификатору</option>
+            }
+            if (@ViewBag.SORT == "NAME")
+            {
+                <option selected value="NAME">Названию</option>
+            }
+            else
+            {
+                <option value="NAME">Названию</option>
+            }
+            if (@ViewBag.SORT == "TICKNESS")
+            {
+                <option selected value="TICKNESS">Толщине</option>
+            }
+            else
+            {
+                <option value="TICKNESS"> Толщине </option>
+            }
+            if (@ViewBag.SORT == "SIZE")
+            {
+                <option selected value="SIZE">размеру</option>
+            }
+            else
+            {
+                <option value="SIZE">размеру</option>
+            }
+            if (@ViewBag.SORT == "QTY")
+            {
+                <option selected value="QTY"> Количеству </option>
+            }
+            else
+            {
+                <option value="QTY"> Количеству </option>
+            }
+        }
+    </select>
+    &nbsp;
+    <input id="Sorttype" type="submit" value="Применить" />
+</form>
+<input id="Button1" type="button" value="Фильтр" onclick="showhidefilter();" />
+<br />
+<form class="filtermnu">
+    название содержит:
+    <input id="Selectname" type="text" name="_Name" /><br />
+    <br />
+    Толщина=
+    <select id="Selecttikn" name="tikn" onchange="sizefilter()">
+        <option selected value="Любая">Любая</option>
+        @{
+            foreach (float k in ViewBag.t)
+            {
+                <option value="@k">@k</option>
+            }
+        }
+    </select>
+    <br />
+    &nbsp;&nbsp;длина от:
+    <input id="Width1" type="text" name="minwidth" size="3" /> до <input id="Width2" type="text" name="maxwidth" size="3" />
+    <br />
+    <br />
+    ширина от:
+    <input id="Heigth1" type="text" name="minheigth" size="3" /> до <input id="Heigth2" type="text" name="maxheigth" size="3" />
+    <br />
+    @{
+        if (ViewBag.split)
+        {<input type="checkbox" id="list" name="split" checked>}
+        else
+        {<input type="checkbox" id="list" name="split">}
+    }
+    разбить по разным раскроям.
+    <br>
+    <input id="hsort" type="hidden" name="SORT" />
+    <input id="hcb1" type="hidden" name="hdone" />
+    <input id="hcb2" type="hidden" name="hcute" />
+    <input id="Patternaply" type="submit" value="Применить" />
+</form>
+</div>
+<div class="col-sm-6">
+    <input class="form-control" id="myInput" type="text" placeholder="Найти по имени..">
+    <input hidden id="sor" value="@ViewBag.SORT">
+</div>
+</div>
+<br />
+<table>
+    <thead>
+        <tr>
+            <th class="sorted" onclick="document.location.replace('?SORT=ID&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">№</thclass="sorted">
+            <th class="sorted" onclick="document.location.replace('?SORT=NAME&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">Имя</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=TICKNESS&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">толщина</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=SIZE&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">ширина</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=SIZE&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">высота</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=QTY&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">кол-во</th>
+            <th>вырезано</th>
+            <th>раскрой</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @{
+            int ogg = 1;
+            int allpartssum = 0;
+            int apsc = 0;
+            int psc = 0;
+            int partssum = 0;
+            int oggh = 1;
+            foreach (var x in ViewBag.Parts)
+            {
+                if (x.QuantitySummary <= x.QuantityCutted)
+                {
+                    oggh = 1 - oggh;
+                    allpartssum += x.QuantitySummary;
+                    apsc += x.QuantityCutted;
+                    <tr class="hiddenrow_@oggh">
+                        <td>@x.Id</td>
+                        <td onclick="tofilter('@x.Name')">@x.Name</td>
+                        <td class="ST">@x.tickness</td>
+                        <td>@Math.Round(Convert.ToDouble(x.Size_X), MidpointRounding.AwayFromZero)</td>
+                        <td>@Math.Round(Convert.ToDouble(x.Size_Y), MidpointRounding.AwayFromZero)</td>
+                        <td>@x.QuantitySummary</td>
+                        <td>@x.QuantityCutted</td>
+                        <td>
+                            @{
+                                string[] s = x.CNCID.Split("; "[0]);
+                                for (int i = 0; i < s.Length - 1 + (ViewBag.split ? 1 : 0); i++)
+                                {
+                                     if (s[i][0] == '-')
+                                     {<a href="Partslist?CNCID=@s[i].Substring(1)"><s>@s[i].Substring(1)</s></a><text>;</text>}
+                                     else
+                                     {<a href="Partslist?CNCID=@s[i]">@s[i]</a><text>;</text>}
+                            if ((((i + 1) % 8) == 0))
+                            {<br>}
+                            else { }
+                        }
+
+                            }
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    ogg = 1 - ogg;
+                    partssum += x.QuantitySummary;
+                    psc += x.QuantityCutted;
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>@x.Id</td>
+                        <td onclick="tofilter('@x.Name')">@x.Name</td>
+                        <td class="ST">@x.tickness</td>
+                        <td>@Math.Round(Convert.ToDouble(x.Size_X), MidpointRounding.AwayFromZero)</td>
+                        <td>@Math.Round(Convert.ToDouble(x.Size_Y), MidpointRounding.AwayFromZero)</td>
+                        <td>@x.QuantitySummary</td>
+                        <td>@x.QuantityCutted</td>
+                        <td>
+                            @{
+                                string[] s = x.CNCID.Split(";"[0]);
+                                for (int i = 0; i < s.Length - 1 + (ViewBag.split ? 1 : 0); i++)
+                                {
+                                    if (s[i][0] == '-')
+                                    {<a href="Partslist?CNCID=@s[i].Substring(1)"><s>@s[i].Substring(1)</s></a><text>;</text>}
+                                else
+                                {<a href="Partslist?CNCID=@s[i]">@s[i]</a><text>;</text>}
+                            if ((((i + 1) % 8) == 0))
+                            {<br>}
+                            else { }
+                        }
+
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            ogg = 1 - ogg;
+            oggh = 1 - oggh;
+            <tr class="hiddenrow_@oggh">
+                <td></td>
+                <td align="right">готово</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@allpartssum</td>
+                <td>@apsc</td>
+                <td></td>
+            </tr>
+            <tr class="alwaysshowrow_@ogg">
+                <td></td>
+                <td align="right">в работе </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@partssum</td>
+                <td>@psc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td align="right">Итого: </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@(partssum + allpartssum)</td>
+                <td>@(psc + apsc)</td>
+                <td></td>
+            </tr>
+
+
+        }
+    </tbody>
+</table>
+<a href="#" class="back-to-top"></a>
+<script>
+    showhidefilter();
+    function showhidefilter() {
+        var elems = document.getElementsByClassName("filtermnu");
+        for (var i = 0; i < elems.length; i++) {
+            if (filtershow) elems[i].style.display = "table-row";
+            else elems[i].style.display = "none";
+        }
+        filtershow = !filtershow;
+    }
+    function sizefilter() {
+        let t = document.getElementById('Selecttikn').value;
+        let cb_1 = document.getElementById('cb1').checked;
+        let cb_2 = document.getElementById('cb2').checked;
+        showOrHide("cb1");
+        showOrHide("cb2");
+        if (t != 'Любая')
+        {
+            s = document.getElementsByClassName("ST");
+            for (var i = 0; i < s.length; i++) if ((s[i].innerText != t)) s[i].parentNode.style.display = 'none';
+        }
+    }
+    function tofilter(elem) {
+        document.getElementById('Selectname').value = elem.substring(0, (elem.lastIndexOf('т') == -1) ? elem.length : elem.lastIndexOf('т'));
+    }
+    showOrHide("cb1");
+    showOrHide("cb2");
+    var filtershow = false;
+    showhidefilter();
+    function syncro() {
+        document.getElementById('hsort').value = document.getElementById('sort').value;
+        document.getElementById('hcb1').value = document.getElementById('cb1').value;
+        document.getElementById('hcb2').value = document.getElementById('cb2').value;
+    }
+    window.addEventListener('load', function() {let timerId = setInterval(checkUpdate, 18000);})
+    function checkUpdate() {
+        xmlRequest.open("POST", "CheckUpdateTable?tablename=PARTS");
+        xmlRequest.onreadystatechange = checkupdaterequest;
+        xmlRequest.send(null);
+    }
+
+</script>

@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewBag.Title = "newCNC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Загрузить программы в очередь исполнения</h2>
+<form action="~/API/newCNC">
+    <input name="uploads" type="file" multiple /><input type="submit"/>
+
+</form>

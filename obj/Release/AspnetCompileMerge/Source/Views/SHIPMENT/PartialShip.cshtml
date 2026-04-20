@@ -1,0 +1,173 @@
+﻿@{
+    ViewBag.Title = "PartsList";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/cssworld.ru-xcal.css" />
+<script type="text/javascript" src="~/Scripts/cssworld.ru-xcal.js"></script>
+<input type='hidden' id='cb1' onchange='showOrHide("cb1");' checked />
+    @{
+        if (@ViewBag.hdone)
+        {
+            <input type='hidden' id='cb1' onchange='showOrHide("cb1");' checked />
+        }
+        else
+        {
+            <input type='hidden' id='cb1' onchange='showOrHide("cb1");' />
+        }
+    }
+
+    @{
+        if (@ViewBag.hcute)
+        {
+            <input type='hidden' id='cb2' onchange='showOrHide("cb2");' checked />
+        }
+        else
+        {
+            <input type='hidden' id='cb2' onchange='showOrHide("cb2");' />
+        }
+    }
+
+<table>
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Имя</th>
+            <th>толщина</th>
+            <th>ширина</th>
+            <th>высота</th>
+            <th>кол-во</th>
+            <th>вырезано</th>
+            <th>Отгружено</th>
+            @if (((ViewBag.User.Privilegies & ViewBag.chapters_ShipManaged) != 0)) {<th>Отгрузить</th>}
+            
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int ogg = 1;
+            int allpartssum = 0;
+            int apsc = 0;
+            int psc = 0;
+            int partssum = 0;
+            int oggh = 1;
+            foreach (var x in ViewBag.Parts)
+            {
+                if (x.QuantitySummary <= x.QuantityCutted)
+                {
+                    oggh = 1 - oggh;
+                    allpartssum += x.QuantitySummary;
+                    apsc += x.QuantityCutted;
+                    <tr class="hiddenrow_@oggh">
+                        <td>@x.Id</td>
+                        <td onclick="tofilter('@x.Name')">@x.Name</td>
+                        <td>@x.tickness</td>
+                        <td>@x.Size_X</td>
+                        <td>@x.Size_Y</td>
+                        <td>@x.QuantitySummary</td>
+                        <td>@x.QuantityCutted</td>
+                        <td>@x.Shipped</td>
+                        @if ((ViewBag.User.Privilegies & ViewBag.chapters_ShipManaged) != 0)
+                        {
+                            <td>
+                                <button onclick='document.getElementById("QUANTITY_part_@x.Id").setAttribute("Value",0)'>0</button>
+                                <input width="5" id="QUANTITY_part_@x.Id" type="number" name="Q_@x.Id" value="0" min="0" max="@(x.QuantityCutted - x.Shipped)" />
+                                <button onclick='document.getElementById("QUANTITY_part_@x.Id").setAttribute("Value",@(x.QuantityCutted - x.Shipped))'>Max</button>
+                                <button onclick='shOnePart("@x.Name",document.getElementById("QUANTITY_part_@x.Id").value)'>Отправить детали</button>
+                            </td>
+                        }
+                        else { }
+                    </tr>
+                }
+                else
+                {
+                    ogg = 1 - ogg;
+                    partssum += x.QuantitySummary;
+                    psc += x.QuantityCutted;
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>@x.Id</td>
+                        <td onclick="tofilter('@x.Name')">@x.Name</td>
+                        <td>@x.tickness</td>
+                        <td>@x.Size_X</td>
+                        <td>@x.Size_Y</td>
+                        <td>@x.QuantitySummary</td>
+                        <td>@x.QuantityCutted</td>
+                        <td>@x.Shipped</td>
+                        @if ((ViewBag.User.Privilegies & ViewBag.chapters_ShipManaged) != 0)
+                        {
+                            <td>
+                                <button onclick='document.getElementById("QUANTITY_part_@x.Id").setAttribute("Value",0)'>0</button>
+                                <input width="5" id="QUANTITY_part_@x.Id" type="number" name="Q_@x.Id" value="0" min="0" max="@(x.QuantityCutted - x.Shipped)" />
+                                <button onclick='document.getElementById("QUANTITY_part_@x.Id").setAttribute("Value",@(x.QuantityCutted - x.Shipped))'>Max</button>
+                                <button onclick='shOnePart("@x.Name", document.getElementById("QUANTITY_part_@x.Id").value)'>Отправить детали</button>
+                            </td>
+                        }
+                        else { }
+                    </tr>
+                }
+            }
+            ogg = 1 - ogg;
+            oggh = 1 - oggh;
+            <tr class="hiddenrow_@oggh">
+                <td></td>
+                <td align="right">готово</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@allpartssum</td>
+                <td>@apsc</td>
+                <td></td>
+            </tr>
+            <tr class="alwaysshowrow_@ogg">
+                <td></td>
+                <td align="right">в работе </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@partssum</td>
+                <td>@psc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td align="right">Итого: </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@(partssum + allpartssum)</td>
+                <td>@(psc + apsc)</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button onclick="ShipAllMarkPosition()">отгрузить отмеченные позиции</button>
+<script>
+    showOrHide("cb1");
+    showOrHide("cb2");
+    async function shOnePart(partname,qty)
+    {
+        try {
+            let response = await fetch('@Url.Action("ShipOnePosition","SHIPMENT")'+'?partName=' + partname + '&Quantity=' + qty);
+            response = await response.json();
+        
+            if (response.result == true) {
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+    async function ShipAllMarkPosition()
+    {
+        var S=document.getElementsByTagName('tr');
+        var H=S[0].innerText.split('\t');
+        var IndexName=H.indexOf('Имя');
+        var IndexShip=H.indexOf('Отгрузить')
+        for (var i=1;i<S.length-3;i++){
+            var name=S[i].innerText.split('\t')[IndexName];
+            var qty=S[i].children[IndexShip].children[S[i].innerText.split('\t')[IndexShip].split(' ').indexOf('Max')-1].value
+            if (qty>0) shOnePart(name,qty);
+        }
+        location.reload();
+        return;
+    }
+</script>

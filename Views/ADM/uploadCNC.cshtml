@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewBag.Title = "uploadCNC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h3>Загрузить на сервер один или несколько файлов.</h3>
+
+<p>Выерите один или несколько файлов</p>
+@using (Html.BeginForm("newCNC", "API", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <input type="file" name="uploads" id="FL" multiple/>
+    <br>
+    <input type="submit" value="Загрузить" onclick="validate()"/>
+}
+<script>
+    function validate()
+    {
+        var v = $('#FL');
+        var t=$('#Response')
+        var f = new FormData();
+        console.log(v);
+
+        
+    }
+</script>

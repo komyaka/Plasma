@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "PartsList";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/cssworld.ru-xcal.css" />
+<script type="text/javascript" src="~/Scripts/cssworld.ru-xcal.js"></script>
+<input type='hidden' id='cb1' onchange='showOrHide("cb1");' checked />
+<table>
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>Имя</th>
+            <th>толщина</th>
+            <th>ширина</th>
+            <th>высота</th>
+            <th>кол-во</th>
+            <th>вырезано</th>
+            <th>раскрой</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int ogg = 1;
+            int allpartssum = 0;
+            int apsc = 0;
+            int psc = 0;
+            int partssum = 0;
+            int oggh = 1;
+            foreach (var x in ViewBag.Parts)
+            {
+                if (x.QuantitySummary <= x.QuantityCutted)
+                {
+                    oggh = 1 - oggh;
+                    allpartssum += x.QuantitySummary;
+                    apsc += x.QuantityCutted;
+                    <tr class="hiddenrow_@oggh">
+                        <td>@x.Id</td>
+                        <td onclick="tofilter('@x.Name')">@x.Name</td>
+                        <td>@x.tickness</td>
+                        <td>@x.Size_X</td>
+                        <td>@x.Size_Y</td>
+                        <td>@x.QuantitySummary</td>
+                        <td>@x.QuantityCutted</td>
+                        <td>@x.CNCID</td>
+                    </tr>
+                }
+                else
+                {
+                    ogg = 1 - ogg;
+                    partssum += x.QuantitySummary;
+                    psc += x.QuantityCutted;
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>@x.Id</td>
+                        <td onclick="tofilter('@x.Name')">@x.Name</td>
+                        <td>@x.tickness</td>
+                        <td>@x.Size_X</td>
+                        <td>@x.Size_Y</td>
+                        <td>@x.QuantitySummary</td>
+                        <td>@x.QuantityCutted</td>
+                        <td>@x.CNCID</td>
+                    </tr>
+                }
+            }
+            ogg = 1 - ogg;
+            oggh = 1 - oggh;
+            <tr class="hiddenrow_@oggh">
+                <td></td>
+                <td align="right">готово</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@allpartssum</td>
+                <td>@apsc</td>
+                <td></td>
+            </tr>
+            <tr class="alwaysshowrow_@ogg">
+                <td></td>
+                <td align="right">в работе </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@partssum</td>
+                <td>@psc</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td align="right">Итого: </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>@(partssum + allpartssum)</td>
+                <td>@(psc + apsc)</td>
+                <td></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="row">
+    <div class="col-sm-4" id="ncinfo">
+        <h4>@ViewBag.info.head.Filename</h4>
+        <p>Размер листа @ViewBag.info.head.sheet.Width X @ViewBag.info.head.sheet.Heigth</p>
+        <p>Размер раскроя @ViewBag.info.Nest.Width X @ViewBag.info.Nest.Heigth</p>
+        <p>Материал - @ViewBag.info.head.materials[@ViewBag.info.head.sheet.Material].about ( @ViewBag.info.head.sheet.Tickness мм )</p>
+        <p>Резать - @ViewBag.info.head.Nest.CutTimes лист(-а,-ов)</p>
+        <p>Время выполнения резки - ( @ViewBag.info.Nest.JobTime x @ViewBag.info.head.Nest.CutTimes шт.) </p>
+        <p>Количество пробивок -@ViewBag.info.Nest.M21Count</p>
+        <p>Длина реза - @ViewBag.info.Nest.cutlength</p>
+        <p>Длина Х.Х. - @ViewBag.info.Nest.fastmovelength</p>
+    </div>
+    <div class="col-sm-8">
+        <canvas id="canva_@ViewBag.Parts[0].CNCID" class="mycanva"></canvas>
+    </div>
+</div>
+<script>
+    showOrHide("cb1");
+    visual('@ViewBag.Parts[0].CNCID', 'canva_@ViewBag.Parts[0].CNCID');
+    function syncro() { }
+</script>
+<script type="text/javascript" src="~/Scripts/PaintCNC.js"></script>
+
+

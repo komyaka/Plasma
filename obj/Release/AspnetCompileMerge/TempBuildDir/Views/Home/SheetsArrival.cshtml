@@ -1,0 +1,243 @@
+﻿@{
+    ViewBag.Title = "Поступление листов";
+}
+<!--
+<form>
+    <input type='checkbox' id='cb1' onchange='showOrHide("cb1");' />Показывать начатые
+    <br />
+    Сортировать по :
+    <select name="SORT">
+        @{
+            if (@ViewBag.SORT == "ID")
+            {
+                <option selected value="ID">Умолчанию</option>
+            }
+            else
+            {
+                <option value="ID">Умолчанию</option>
+            }
+            if (@ViewBag.SORT == "STEEL")
+            {
+                <option selected value="STEEL">Материал</option>
+            }
+            else
+            {
+                <option value="STEEL">Материал</option>
+            }
+            if (@ViewBag.SORT == "TICKNESS")
+            {
+                <option selected value="TICKNESS">Толщине</option>
+            }
+            else
+            {
+                <option value="TICKNESS"> Толщине </option>
+            }
+            if (@ViewBag.SORT == "SIZE")
+            {
+                <option selected value="SIZE">размеру</option>
+            }
+            else
+            {
+                <option value="SIZE">размеру</option>
+            }
+        }
+    </select>
+    &nbsp;
+    <input type="submit" value="Применить" />
+</form>
+-->
+<table>
+    <thead>
+        <tr>
+            <th class="sorted" onclick="document.location.replace('?SORT=DATE');">Дата (№Докумета) </th>
+
+            <th class="sorted" onclick="document.location.replace('?SORT=MATHERIAL');">Марка стали</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=TIKN');">толщина</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=WIDTH');">ширина</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=HEIGTH');">высота</th>
+            <th class="sorted" onclick="document.location.replace('?SORT=QTY');">кол-во</th>
+            <th>Программа/<br />владелец</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int ogg = 1;
+            int oggh = 1;
+            foreach (var x in ViewBag.Sheets)
+            {
+                if (x.Name == "")
+                {
+                    ogg = 1 - ogg;
+                    <tr class="alwaysshowrow_@ogg">
+                        <td>
+                            @x.Date.ToString("dd/MM/yy").Replace("/", ".") (@x.Document)
+                            @if ((ViewBag.User.Privilegies & 16) != 0)
+                            {<a><img src="~/img/edit.png" onclick='editSheetArrival(le,lq,"@x.Date.ToString("dd/MM/yy").Replace("/", ".")","@x.Document.Trim()",@x.Tickness,@x.Matherial,@x.Width,@x.Heigth,@x.Quantity,"@x.Owner")' , style="margin-left:10px;"></a>}
+                        </td>
+                        <td>@ViewBag.m[x.Matherial]</td>
+                        <td>@x.Tickness</td>
+                        <td>@x.Width</td>
+                        <td>@x.Heigth</td>
+                        <td>@x.Quantity</td>
+                        <td>@x.Owner</td>
+                    </tr>
+                }
+                else
+                {
+                    ogg = 1 - ogg;
+                    <tr class="hiddenrow_@ogg">
+                        <td>
+                            @x.Date.ToString("dd/MM/yy").Replace("/", ".") (@x.Document)
+                            @if ((ViewBag.User.Privilegies & 16) != 0)
+                            {<a><img src="~/img/edit.png" onclick='editSheetArrival(le,"@x.Date.ToString("dd/MM/yy").Replace("/", ".")","@x.Document.Trim()",@x.Tickness,@x.Matherial,@x.Width,@x.Heigth,@x.Quantity,"@x.Owner")' , style="margin-left:10px;"></a>}
+                        </td>
+                        <td>@ViewBag.m[x.Matherial]</td>
+                        <td>@x.Tickness</td>
+                        <td>@x.Width</td>
+                        <td>@x.Heigth</td>
+                        <td>@x.Quantity</td>
+                        <td>@x.Name</td>
+                    </tr>
+                }
+            }
+
+        }
+    </tbody>
+</table>
+@if ((ViewBag.User.Privilegies & 32768) != 0)
+{
+}
+<p>На 1 стадии разработки</p>
+@if ((ViewBag.User.Privilegies & 16) != 0)
+{
+    <div id="myModal" class="modal modalsheet">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form class="formEditSheetArrival">
+                <h4>Изменение прихода листов</h4>
+                <div>
+                    Материал
+                    <select id="matsel" name="mat" onchange="syncrosize();">
+                        @{ int matcount = 0;
+                            foreach (string M in ViewBag.m)
+                            {
+                                if (M.Length > 0)
+                                {
+                                    <option value="@matcount">@M</option>
+                                }
+                                matcount++;
+                            }
+                        }
+                    </select>
+                    <img src="~/IMG/attent.png" id="nomat" alt="Укажите материал" title="Укажите материал" align="bottom" />
+                </div>
+                Толщина=
+                <select id="Selecttikn" name="tikn" onchange="seltik();">
+                    @{
+                        foreach (float k in ViewBag.t)
+                        {
+                            <option value="@k">@k</option>
+                        }
+                    }
+                </select>
+                <p id="massa">масса листа ~ 0 кг</p>
+                Размер
+                <select id="sizesel" name="Size" onchange="syncrosize();">
+                    <option selected value="s6000x1500">6000х1500</option>
+                    <option value="s6000x2000">6000х2000</option>
+                    <option value="s12000x1500">12000х1500</option>
+                    <option value="s12000x2000">12000х2000</option>
+                    <option value="s2500x1250">2500х1250</option>
+                    <option value="s2000x1000">2000х1000</option>
+                    <option value="OTHERSIZE">другой</option>
+                </select>
+                <div id="SS" style="display:none">
+                    длина
+                    <input id="SheetWidth" type="number" name="WIDTH" width="3" onchange="updatemass();" />
+                    Ширина
+                    <input id="SheetHeigth" type="number" name="HEIGTH" width="5" onchange="updatemass();" />
+                    <br>
+                </div>
+                количество
+                <input id="QUANTITY" type="number" name="Quantity" value="1" onchange="updatemass();" />
+                <br>
+                заказчик
+                <input id="OWNER" type="TEXT" name="OWNER" value="МОНТАЖНИК" />
+                <br>
+                Документ №
+                <input id="DOC" type="TEXT" name="DOC" value="" width="3" />
+                <br>
+                дата
+                <input id="Date" type="text" name="Date" value="@ViewBag.now" size="19" onClick="xCal(this)" onKeyUp="xCal()">
+                <p></p>
+                <button onclick="sendSheetModification(le)">Принять изменения</button>            
+            </form>
+        </div>
+
+    </div>
+    @Scripts.Render("~/Scripts/admtools.js")
+<script>
+    var le = '@Url.RouteUrl(new { controller = "Home", action = "EditSheetArrival"})';
+    var lq = '@Url.RouteUrl(new { controller = "Home", action = "EditSheetArrivalMinQty"})';
+    function findIndex(vk, val) { for (var i = 0; i < vk.length; i++) { if (vk[i].value == val) return i; } return -1; }
+    function seltik() {
+        var tickn = document.getElementById('Selecttikn').value.replace(",", ".");
+        switch (tickn) {
+            case "1": case "1.2": case "1.5": case "2": document.getElementById("sizesel").value = "s2500x1250";
+
+                break;
+            default: document.getElementById("sizesel").value = "s6000x1500";
+        }
+        syncrosize();
+    }
+    function syncrosize() {
+        if (document.getElementById('matsel').value == "0") { document.getElementById('nomat').style.display = "inline"; } else { document.getElementById('nomat').style.display = "none"; }
+        var sizetype = document.getElementById('sizesel').value;
+        switch (sizetype) {
+            case "s6000x1500": setsheetsize(6000, 1500); hidess(); break;
+            case "s6000x2000": setsheetsize(6000, 2000); hidess(); break;
+            case "s12000x1500": setsheetsize(12000, 1500); hidess(); break;
+            case "s12000x2000": setsheetsize(12000, 2000); hidess(); break;
+            case "s2500x1250": setsheetsize(2500, 1250); hidess(); break;
+            case "s2000x1000": setsheetsize(2000, 1000); hidess(); break;
+            case "OTHERSIZE": setsheetsize("", ""); showss(); break;
+        }
+        updatemass();
+    }
+    function setsheetsize(width, heigth) {
+        document.getElementById("SheetWidth").value = width; document.getElementById("SheetHeigth").value = heigth
+    }
+    function hidess() { document.getElementById("SS").style.display = "none"; }
+    function showss() { document.getElementById("SS").style.display = "block"; }
+    function updatemass() {
+        document.getElementById('massa').innerHTML = "масса листа ~ " + document.getElementById("QUANTITY").value * (document.getElementById("SheetWidth").value * document.getElementById("SheetHeigth").value / 1000000.0) * document.getElementById('Selecttikn').value.replace(",", ".") * (7850 / 1000) + " кг";
+    }
+var modal = document.getElementById("myModal");
+
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+}
+<script>
+    showOrHide("cb1");
+    window.addEventListener('load', function() {let timerId = setInterval(checkUpdate, 18000);})
+    function checkUpdate() {
+        xmlRequest.open("POST", "CheckUpdateTable?tablename=SHEETS");
+        xmlRequest.onreadystatechange = checkupdaterequest;
+        xmlRequest.send(null);
+    }
+    function syncro() { }
+</script>

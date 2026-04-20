@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/mytableclasstyle.css")
+    @Scripts.Render("~/Scripts/myAjax.js")
+    @Scripts.Render("~/Scripts/PaintCNC.js")
+    @Scripts.Render("~/Scripts/ShowHide.js")
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.js"></script>
+    <link rel="shortcut icon" href="~/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+    @RenderPage("_LayoutMenu.cshtml")
+    <div class="row">
+        <div class="col-sm-10"><span id="PleaceUpdate" class="h4 text-warning" style="display:none">Обновите страницу, информация не актуальна</span></div>
+        <div class="col-sm-2"><span id="Currenttime" class="text-right">@ViewBag.currenttime</span></div>
+    </div>
+    <p id="Response"></p>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <div class="navbar navbar-inverse navbar-fixed-bottom">
+            <footer>
+                <p id="bottomlogo" class="text-center align-middle">&copy;ИВАНОВО WEBTECH @DateTime.Now.Year</p>
+            </footer>
+        </div>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/modernizr")
+    <!--    @Scripts.Render("~/Scripts/filter.js") -->
+    <script>
+
+    </script>
+</body>
+
+</html>

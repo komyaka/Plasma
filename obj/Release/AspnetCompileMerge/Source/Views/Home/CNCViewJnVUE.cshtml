@@ -1,0 +1,122 @@
+﻿
+@{
+    ViewBag.Title = "CNCViewJnVUE";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!--<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<div id="AppGlobal">
+    <div id="example-1">
+        <section v-if="errored">
+            <p>Ошибка получения данных с сервера</p>
+        </section>
+        <section v-else>
+            <div v-if="loading">Loading...</div>
+            <div v-else>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <input type="checkbox" id="checkbox" v-model="viewall">
+                        <label for="checkbox">Скрыть готовые</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" id="myInput" type="text" placeholder="Найти по имени..">
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+
+                    <th><a v-on:click="sortParam='Number'">№</a></th>
+                    <th><a v-on:click="sortParam='File'">файл</a></th>
+                    <th><a v-on:click="sortParam='Tickness'">толщина</a></th>
+                    <th><a v-on:click="sortParam='Qty'">кол-во</a></th>
+                    <th><a v-on:click="sortParam='Done'">вырезано</a></th>
+                    <th><a v-on:click="sortParam='Time'">время<br>производства</a></th>
+                    </thead>
+                    <tbody id="myTable">
+                        <tr v-for="it in sortedList" v-if="((it.Quantity>it.QuantityDone)||(!viewall))" v-bind:class="rowClass(it.Quantity>it.QuantityDone)" v-bind:style="stbl">
+                            <td>{{ it.Id }}</td>
+                            <td class="l">
+                                <!--
+        <div v-on:click='showSubMNUV(it.Id)'>{{ it.OriginalName | clearName}}</div>
+        <div id="mymnu_{{ it.Id }}" class="vis">
+        <a href="/Home/PartsList?CNCID={{ it.Id }}" class="l">Список деталей</a>
+        <br>
+        <a class="l" onclick='visual({{ it.Id }},"canva_{{ it.Id }}")'>Показать раскладку</a>
+        <a id="Canva_{{ it.Id }}"></a>
+        <canvas id="canva_{{ it.Id }}" class="mycanva">
+            </canvas>
+
+        </div>
+                                                -->
+                                {{ it.OriginalName | clearName}}
+                            </td>
+                            <!--  <td>{{ it.OriginalName| clearName}}</td>  -->
+                            <td>{{ it.tickness }}</td>
+                            <td>{{ it.Quantity }}</td>
+                            <td>{{ it.QuantityDone }}</td>
+                            <td>{{ it.RunTimeOneSheet }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+<script>
+    var example1 = new Vue({
+        el: '#example-1',
+        data: {
+            viewall: true,
+            info: null,
+            stbl: { display: 'table-row' },
+            hd: false,
+            loading: false,
+            errored: false,
+            ax: 1,
+            cx: 1,
+            sortParam: '',
+        },
+        mounted() {
+            axios
+                .get('@Url.RouteUrl(new { controller = "Home", action = "GetAlCncTable"})')
+                .then(response => (this.info = response.data))
+                .catch(error => { console.log(error); this.errored = true; })
+                .finally(() => (this.loading = false))
+        },
+        methods: {
+            rowClass: function (show) {
+                if (show) { this.ax = 1 - this.ax; return ('alwaysshowrow_' + this.ax); }
+                else { this.cx = 1 - this.cx; return ('hiddenrow_' + this.cx); }
+                return '';
+            },
+            showSubMNUV: function (id) { showSubMNU('mymnu_' + id); return; }
+
+        },
+        filters: {
+            clearName(s) { return freename(s) }
+        },
+        computed: {
+            sortedList() {
+                switch (this.sortParam) {
+                    case 'Number': return this.info.sort(sortByNumber);
+                    case 'File': return this.info.sort(sortByFile);
+                    case 'Tickness': return this.info.sort(sortByTickness);
+                    case 'Qty': return this.info.sort(sortByQty);
+                    case 'Done': return this.info.sort(sortByDone);
+                    case 'Time': return this.info.sort(sortByTime);
+                    default: return this.info;
+                }
+            }
+        }
+    }
+    )
+    var sortByNumber = function (d1, d2) { return (d1.Id > d2.Id) ? 1 : -1; };
+    var sortByFile = function (d1, d2) { return ((+d1.tickness == +d2.tickness) ? ((d1.OriginalName.toLowerCase() > d2.OriginalName.toLowerCase()) ? 1 : -1) : ((+d1.tickness > +d2.tickness) ? 1 : -1)); };
+    var sortByTickness = function (d1, d2) { return ((+d1.tickness > +d2.tickness) ? 1 : -1); };
+    var sortByQty = function (d1, d2) { return (d1.Quantity > d2.Quantity) ? 1 : -1; };
+    var sortByDone = function (d1, d2) { return (d1.QuantityDone > d2.QuantityDone) ? 1 : -1; };
+    var sortByTime = function (d1, d2) { return (d1.RunTimeOneSheet > d2.RunTimeOneSheet) ? 1 : -1; };
+    var freename = function (s) { return s.split('\\').pop().split('/').pop(); }
+</script>
+

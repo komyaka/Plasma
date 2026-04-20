@@ -1,0 +1,99 @@
+.hiddenrow 
+{
+background-color: #ffffff; /* Цвет фона веб-страницы */
+color: #000000; /* Цвет основного текста */
+display:none;
+}
+.hiddenrow_1 {
+    background-color: #fafafa; /* Цвет фона веб-страницы */
+    opacity:0.8;
+    color: #000000; /* Цвет основного текста */
+    display: none;
+    margin: 5px;
+}
+.hiddenrow_0 {
+    background-color: #ffffff; /* Цвет фона веб-страницы */
+    color: #000000; /* Цвет основного текста */
+    opacity: 0.8;
+    display: none;
+    margin: 5px;
+}
+.alwaysshowrow_0 {
+    background-color: #e0ffe0; /* Цвет фона веб-страницы */
+    opacity: 0.8;
+    color: #000000; /* Цвет основного текста */
+    margin: 5px;
+}
+.alwaysshowrow_1 {
+    background-color: #daffda; /* Цвет фона веб-страницы */
+    opacity: 0.8;
+    color: #000000; /* Цвет основного текста */
+    margin: 5px;
+}
+tr.hiddenrow_0:hover {
+    background-color: Gold;
+}
+
+tr.hiddenrow_1:hover {
+    background-color: Gold;
+}
+tr.alwaysshowrow_0:hover {
+    background-color: Gold;
+}
+
+tr.alwaysshowrow_1:hover {
+    background-color: Gold;
+}
+.sorted:hover {
+    background-color:cornflowerblue;
+}
+tr {
+    margin: 5px;
+    border-spacing:5px;
+}
+
+
+
+
+
+
+
+.list-group-item {
+    padding: 5px 7px;
+}
+
+button {
+    margin: 5px;
+}
+
+.mg-5 {
+    margin: 5px;
+    width: 200px
+}
+
+.lenlist {
+    margin: 5px;
+    width: 217px;
+    height: 320px;
+    overflow-y: scroll;
+}
+
+.numInput {
+    margin: 5px;
+    width: 6em;
+}
+
+.qtyInput {
+    margin: 5px;
+    width: 4em;
+}
+
+.CutSaw td {
+    padding: 0 15px 0 15px;
+    font-size: 1.2em;
+}
+
+.lineHead {
+    font-size: 1em;
+    padding: 10px 5px;
+}

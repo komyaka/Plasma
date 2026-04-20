@@ -1,0 +1,102 @@
+﻿<link rel="stylesheet" type="text/css" href="~/Content/cssworld.ru-xcal.css" />
+<script type="text/javascript" src="~/Scripts/cssworld.ru-xcal.js"></script>
+@{
+    ViewBag.Title = "Добавить листы в базу";
+}
+<h4>Добавить новый лист</h4>
+<form action="~/home/NewSheet2">
+    <div>
+        Материал
+        <select id="matsel" name="mat" onchange="syncrosize();" >
+            @{ int matcount = 0;
+                foreach (string M in ViewBag.mt)
+                {
+                    if (M.Length > 0)
+                    {
+                        <option value="@matcount">@M</option>
+                    }
+                    matcount++;
+                }
+            }
+        </select>
+        <img src="~/IMG/attent.png" id="nomat" alt="Укажите материал" title="Укажите материал" align="bottom" />
+    </div>
+    Толщина=
+    <select id="Selecttikn" name="tikn" onchange="seltik();">
+        @{
+            foreach (float k in ViewBag.t)
+            {
+                <option value="@k">@k</option>
+            }
+        }
+    </select>
+    <p id="massa">масса листа ~ 0 кг</p>
+    Размер
+    <select id="sizesel" name="Size" onchange="syncrosize();">
+        <option selected value="s6000x1500">6000х1500</option>
+        <option value="s6000x2000">6000х2000</option>
+        <option value="s12000x1500">12000х1500</option>
+        <option value="s12000x2000">12000х2000</option>
+        <option value="s2500x1250">2500х1250</option>
+        <option value="s2000x1000">2000х1000</option>
+        <option value="OTHERSIZE">другой</option>
+    </select>
+    <div id="SS" style="display:none">
+        длина
+        <input id="SheetWidth" type="number" name="WIDTH" width="3" onchange="updatemass();" />
+        Ширина
+        <input id="SheetHeigth" type="number" name="HEIGTH" width="5" onchange="updatemass();" />
+        <br>
+    </div>
+    количество
+    <input id="QUANTITY" type="number" name="Quantity" value="1" onchange="updatemass();" />
+    <br>
+    заказчик
+    <input type="TEXT" name="OWNER" value="МОНТАЖНИК" />
+    <br>
+    Документ №
+    <input type="TEXT" name="DOC" value="" width="3" />
+    <br>
+    дата
+    <input type="text" name="Date" value="@ViewBag.now" size="19" onClick="xCal(this)" onKeyUp="xCal()">
+    <input type="submit" value="Добавить в базу">
+</form>
+
+<script>
+    function seltik() {
+        var tickn = document.getElementById('Selecttikn').value.replace(",", ".");
+        switch (tickn) {
+            case "1": case "1.2": case "1.5": case "2": document.getElementById("sizesel").value = "s2500x1250";
+
+                break;
+            default: document.getElementById("sizesel").value = "s6000x1500";
+        }
+        syncrosize();
+    }
+    function syncrosize() {
+        if (document.getElementById('matsel').value == "0") { document.getElementById('nomat').style.display = "inline"; } else { document.getElementById('nomat').style.display = "none"; }
+        var sizetype = document.getElementById('sizesel').value;
+        switch (sizetype) {
+            case "s6000x1500": setsheetsize(6000, 1500); hidess(); break;
+            case "s6000x2000": setsheetsize(6000, 2000); hidess(); break;
+            case "s12000x1500": setsheetsize(12000, 1500); hidess(); break;
+            case "s12000x2000": setsheetsize(12000, 2000); hidess(); break;
+            case "s2500x1250": setsheetsize(2500, 1250); hidess(); break;
+            case "s2000x1000": setsheetsize(2000, 1000); hidess(); break;
+            case "OTHERSIZE": setsheetsize("", ""); showss(); break;
+        }
+        updatemass();
+    }
+    function setsheetsize(width, heigth) {
+        document.getElementById("SheetWidth").value = width; document.getElementById("SheetHeigth").value = heigth
+    }
+    function hidess() { document.getElementById("SS").style.display = "none"; }
+    function showss() { document.getElementById("SS").style.display = "block"; }
+    function updatemass() {
+        document.getElementById('massa').innerHTML = "масса листа ~ " + document.getElementById("QUANTITY").value * (document.getElementById("SheetWidth").value * document.getElementById("SheetHeigth").value / 1000000.0) * document.getElementById('Selecttikn').value.replace(",", ".") * (7850 / 1000) + " кг";
+    }
+    syncrosize();
+
+</script>
+
+

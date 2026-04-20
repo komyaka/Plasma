@@ -1,0 +1,14 @@
+﻿@model Plazma.Models.Error
+
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if (Model.number > 0) { <h2>УПС!.. Ошибка #@Model.number (@Model.text)</h2>}
+else { <h2>УПС!.. Непридвиденная ситуация</h2>}
+    
+<p>Перенаправление на главную страницу...</p>
+<script>
+    setTimeout('location.replace("Index")', 1500);
+</script>
+
