@@ -71,7 +71,7 @@ namespace Plazma.Controllers
             List<cncNames> files = new List<cncNames> { };
             files.Clear();
             string tmpfile = "";
-            string path = @"D:/PlazmaProgs/NewFiles/";
+            string path = AppConfig.CNCUploadPath;  // ИСПРАВЛЕНО: путь из конфига
             foreach (var file in uploads)
             {
                 if (file != null)

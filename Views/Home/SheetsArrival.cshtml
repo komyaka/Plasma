@@ -89,7 +89,7 @@
                         <td>
                             @x.Date.ToString("dd/MM/yy").Replace("/", ".") (@x.Document)
                             @if ((ViewBag.User.Privilegies & 16) != 0)
-                            {<a><img src="~/img/edit.png" onclick='editSheetArrival(le,"@x.Date.ToString("dd/MM/yy").Replace("/", ".")","@x.Document.Trim()",@x.Tickness,@x.Matherial,@x.Width,@x.Heigth,@x.Quantity,"@x.Owner")' , style="margin-left:10px;"></a>}
+                            {<a><img src="~/img/edit.png" onclick='editSheetArrival(le,lq,"@x.Date.ToString("dd/MM/yy").Replace("/", ".")","@x.Document.Trim()",@x.Tickness,@x.Matherial,@x.Width,@x.Heigth,@x.Quantity,"@x.Owner")' , style="margin-left:10px;"></a>}
                         </td>
                         <td>@ViewBag.m[x.Matherial]</td>
                         <td>@x.Tickness</td>

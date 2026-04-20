@@ -66,7 +66,7 @@ namespace Plazma.Controllers
         public void readfromxls(string openFilename)
         {
             // Excel.Application xlApp = new Excel.Application();
-            string grabFile = @"D:\PlazmaProgs\tmp-" + DateTime.Now.Year.ToString() + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.Hour.ToString() + "-" + DateTime.Now.Minute.ToString() + "-" + DateTime.Now.Second.ToString() + "-" + DateTime.Now.Millisecond.ToString() + ".xls";
+            string grabFile = AppConfig.TempFilesPath + @"tmp-"  // ИСПРАВЛЕНО: путь из конфига + DateTime.Now.Year.ToString() + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Day.ToString() + "-" + DateTime.Now.Hour.ToString() + "-" + DateTime.Now.Minute.ToString() + "-" + DateTime.Now.Second.ToString() + "-" + DateTime.Now.Millisecond.ToString() + ".xls";
             if (System.IO.File.Exists(openFilename))
             {
                 /* xlWorkbook = xlApp.Workbooks.Open(grabFile, ReadOnly: true);

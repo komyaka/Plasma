@@ -90,8 +90,8 @@ namespace Plazma.Models
             tempstep.textline = line;
             float tempvalueX, tempvalueY, tempvalueZ, tempvalueI, tempvalueJ, tempvalueK;
             if (m[0].ToString() == "(") { return; }
-            if (m.IndexOf("M21") >= 0) { this.M21Count++; cute = true; }
-            if (m.IndexOf("M21") >= 0) { cute = false; }
+            if (m.IndexOf("M21") >= 0) { this.M21Count++; cute = true; }  // M21 = начало реза
+            if (m.IndexOf("M22") >= 0) { cute = false; }  // M22 = конец реза
             if (m.IndexOf("G90") >= 0) { absolutecoordinates = true; }
             if (m.IndexOf("G91") >= 0) { absolutecoordinates = false; }
 

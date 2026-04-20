@@ -35,7 +35,7 @@ namespace Plazma.Controllers
             List<cncNames> files = new List<cncNames> { };
             files.Clear();
             string tmpfile = "";
-            string path = @"D:/PlazmaProgs/NewFiles/";
+            string path = AppConfig.CNCUploadPath;  // ИСПРАВЛЕНО: путь из конфига
             foreach (var file in uploads)
             {
                 if (file != null)
@@ -141,7 +141,7 @@ namespace Plazma.Controllers
             object result;
             try
             {
-                if (id > 0) parts.FreeRequestToBD("Delete * froms heets Where id=" + id.ToString());
+                if (id > 0) parts.FreeRequestToBD("Delete from sheets Where id=" + id.ToString());  // ИСПРАВЛЕНО: опечатка в SQL
                 else if ((tickness > 0) && (width > 0) && (heigth > 0) && (matherial > 0) && (doc != "*")) parts.FreeRequestToBD("delete from sheets where NAME is null and TICKNESS=" + tickness.ToString()+ " and WIDTH=" + width.ToString()+ "and HEIGTH=" + heigth.ToString()+ " and MATHERIAL=" + matherial+(doc=="*"?"":("and document="+doc)));
                 else if (tickness > 0)
                 { return Json("no tickness"); }
@@ -182,8 +182,8 @@ namespace Plazma.Controllers
         {
 
             parts.readCNC("select * from CNCFILES order by id desc");
-            string path1 = Constants.CNCPath;
-            string path2 = Constants.CNCPath+@"\arhive";
+            string path1 = AppConfig.CNCPath;  // Путь из конфига
+            string path2 = AppConfig.CNCArchivePath  // Путь к архиву из конфига;
             int result = 0;
             //var response = from prt in parts.Parts where (prt.CNCID.Trim() == cncId.ToString());
             foreach (PartsClass._CNC s in parts.CNCs)

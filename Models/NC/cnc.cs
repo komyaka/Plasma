@@ -125,7 +125,7 @@ namespace Plazma.Controllers
             if (tickn == "1,2") return new _speed(_Process.PL50, 8, 4150, 12000, 240); 
             if (tickn == "1_2") return new _speed(_Process.PL50, 8, 4150, 12000, 240);
             if (tickn == "1,5") return new _speed(_Process.PL50, 8, 3200, 12000, 240);
-            if (tickn == "1_5") return new _speed(_Process.PL50, 8, 32000, 12000, 240);
+            if (tickn == "1_5") return new _speed(_Process.PL50, 8, 3200, 12000, 240);
             if (tickn == "2") return new _speed(_Process.PL50, 8, 9800, 12000, 240);
             if (tickn == "3") return new _speed(_Process.PL80, 8, 6145, 12000, 240);
             if (tickn == "4") return new _speed(_Process.PL80, 8, 3670, 12000, 240);
@@ -284,8 +284,8 @@ namespace Plazma.Controllers
             if (m[0].ToString()=="(") { return;  }
             tempstep.textline = line;
             float tempvalueX, tempvalueY, tempvalueZ, tempvalueI, tempvalueJ, tempvalueK;
-            if (m.IndexOf("M21") >= 0) { M21count++; cute = true; }
-            if (m.IndexOf("M21") >= 0) { cute = false; }
+            if (m.IndexOf("M21") >= 0) { M21count++; cute = true; }  // M21 = начало реза
+            if (m.IndexOf("M22") >= 0) { cute = false; }  // M22 = конец реза
             if (m.IndexOf("G90") >= 0) { absolutecoordinates = true; }
             if (m.IndexOf("G91") >= 0) { absolutecoordinates = false; }
 

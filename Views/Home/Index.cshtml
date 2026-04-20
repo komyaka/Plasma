@@ -1,76 +1,101 @@
-﻿@{
-    ViewBag.Title = "Просмотр выданых программ";
+@* ==========================================================================
+   Index.cshtml — Главная страница: список CNC-программ
+   Отображает таблицу программ с возможностью сортировки, фильтрации,
+   визуализации раскладки и управления (для администраторов).
+   Загрузка CNC-файлов происходит во всплывающем модальном окне.
+   ========================================================================== *@
+@{
+    ViewBag.Title = "Просмотр выданных программ";
 }
-<h4>@ViewBag.Name</h4>
+
+<h4>Программы раскроя</h4>
+
+@* --- Панель управления над таблицей --- *@
 <div class="row over-table">
     <div class="col-sm-6">
         <form class="fh">
-            @{ if (ViewBag.CB1 == "")
-                {<input type='checkbox' id='cb1' onchange='showOrHide("cb1");' /><span>Отобразить готовые&nbsp; &nbsp; &nbsp; &nbsp;</span>
-                }
-                else
-                {<input type='checkbox' id='cb1' onchange='showOrHide("cb1");' checked /><span>Отобразить готовые&nbsp; &nbsp; &nbsp; &nbsp;</span>
-                }
+            @* Чекбокс: показать/скрыть выполненные программы *@
+            @if (ViewBag.CB1 == "")
+            {
+                <label><input type='checkbox' id='cb1' onchange='showOrHide("cb1");' /> Отобразить готовые</label>
             }
-            <input type='checkbox' id='cb2' onchange='showOrHide("cb2");' checked />отобразить неготовые
+            else
+            {
+                <label><input type='checkbox' id='cb1' onchange='showOrHide("cb1");' checked /> Отобразить готовые</label>
+            }
+            &nbsp;&nbsp;&nbsp;
+            <label><input type='checkbox' id='cb2' onchange='showOrHide("cb2");' checked /> Отобразить неготовые</label>
         </form>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-4">
+        @* Поле быстрого поиска по тексту в таблице *@
         <input class="form-control" id="myInput" type="text" placeholder="Найти по имени..">
         <input hidden id="sor" value="@ViewBag.SORT">
     </div>
-</div>
-@if (((ViewBag.User.Privilegies & 32768) != 0))
-{
-    <div class="row">
-        <form action="~/adr/newCNC2" method="post" enctype="multipart/form-data">
-            <input name="uploads" type="file" multiple /><input type="submit" />
-        </form>
+    <div class="col-sm-2 text-right">
+        @* Кнопка загрузки CNC — только для администраторов (привилегия 32768) *@
+        @if (((ViewBag.User.Privilegies & 32768) != 0))
+        {
+            <button class="btn-upload" onclick="openUploadModal()">&#8679; Загрузить CNC</button>
+        }
     </div>
-}
+</div>
+
+@* --- Таблица программ --- *@
 <table>
     <thead>
         <tr>
-            <th class="sorted" onclick="document.location.replace('?SORT=ID&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">№ </th>
-            <th class="sorted" onclick="document.location.replace('?SORT=NAME&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">файл</th>
-            <th class="sorted" onclick="document.location.replace('?SORT=TICKNESS&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">толщина</th>
-            <th class="sorted" onclick="document.location.replace('?SORT=QTY&psort=' + document.getElementById('sor').defaultValue+'&cb1='+document.getElementById('cb1').checked)">кол-во</th>
-            <th>вырезано</th>
-            <th>время<br>производства</th>
+            @* Заголовки с сортировкой по клику *@
+            <th class="sorted" onclick="sortBy('ID')">№</th>
+            <th class="sorted" onclick="sortBy('NAME')">Файл</th>
+            <th class="sorted" onclick="sortBy('TICKNESS')">Толщина</th>
+            <th class="sorted" onclick="sortBy('QTY')">Кол-во</th>
+            <th>Вырезано</th>
+            <th>Время</th>
         </tr>
     </thead>
     <tbody id="myTable">
         @{
-            int ogg = 1;
-            int oggh = 1;
+            int ogg = 1;   /* Чередование цвета строк (незавершённые) */
+            int oggh = 1;  /* Чередование цвета строк (завершённые) */
             int fulltime = 0;
             int rtime = 0;
             int countall = 0;
             int countr = 0;
             float ktime = 1;
-            int s = 0;
+
             foreach (var x in ViewBag.CNCs)
             {
-
                 fulltime += x.RunTimeAll * 2;
                 countall++;
-                s++;
+
+                /* Время на один лист (формат ЧЧ:ММ:СС) */
                 var ts = TimeSpan.FromSeconds((int)@x.RunTimeOneSheet * ktime);
-                string fn = x.FileName.Substring(x.FileName.LastIndexOf("\\") + 1, x.FileName.LastIndexOf(".") - x.FileName.LastIndexOf("\\") - 1);
+
+                /* Извлечение имени файла без пути и расширения */
+                string fn = x.FileName.Substring(
+                    x.FileName.LastIndexOf("\\") + 1,
+                    x.FileName.LastIndexOf(".") - x.FileName.LastIndexOf("\\") - 1
+                );
+
                 if (x.Quantity <= x.QuantityDone)
                 {
+                    /* --- Завершённая программа (скрыта по умолчанию) --- */
                     oggh = 1 - oggh;
                     <tr class="hiddenrow_@oggh">
                         <td>
                             @x.Id
                             @if ((ViewBag.User.Privilegies & 32768) != 0)
                             {
-                                <a><img src="~/img/ERR.jpg" width="15px" height="15px" onclick="delcnc(@x.Id,lr)"></a>
+                                <a title="Удалить программу"><img src="~/img/ERR.jpg" width="15px" height="15px" onclick="delcnc(@x.Id,lr)"></a>
                             }
                         </td>
                         <td class="l">
-                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')"> @fn</div>
-                            <div id="mymnu_@x.Id" class="vis"><a href="~/Home/PartsList?CNCID=@x.Id" class="l">Список деталей</a><br><a id="Canva_@x.Id"></a><canvas id="canva_@x.Id" class="mycanva"></canvas></div>
+                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')" style="cursor:pointer;">@fn</div>
+                            <div id="mymnu_@x.Id" class="vis">
+                                <a href="~/Home/PartsList?CNCID=@x.Id" class="l">Список деталей</a><br>
+                                <canvas id="canva_@x.Id" class="mycanva"></canvas>
+                            </div>
                         </td>
                         <td>@x.tickness</td>
                         <td>@x.Quantity</td>
@@ -80,6 +105,7 @@
                 }
                 else
                 {
+                    /* --- Незавершённая программа (всегда видна) --- */
                     ogg = 1 - ogg;
                     countr++;
                     rtime += (x.Quantity - x.QuantityDone) * x.RunTimeOneSheet;
@@ -88,13 +114,16 @@
                             @x.Id
                             @if ((ViewBag.User.Privilegies & 32768) != 0)
                             {
-                                <a><img src="~/img/ok.jpg" width="15px" height="15px" onclick="donecnc(@x.Id,ld)"></a>
-                                <a><img src="~/img/ERR.jpg" width="15px" height="15px" onclick="delcnc(@x.Id,lr)"></a>
+                                <a title="Отметить выполненной"><img src="~/img/ok.jpg" width="15px" height="15px" onclick="donecnc(@x.Id,ld)"></a>
+                                <a title="Удалить программу"><img src="~/img/ERR.jpg" width="15px" height="15px" onclick="delcnc(@x.Id,lr)"></a>
                             }
                         </td>
                         <td class="l">
-                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')">@fn</div>
-                            <div id="mymnu_@x.Id" class="vis"><a href="~/Home/PartsList?CNCID=@x.Id" class="l">Список деталей</a><br><a id="Canva_@x.Id"></a><canvas id="canva_@x.Id" class="mycanva"></canvas></div>
+                            <div onclick="showSubMNU('mymnu_@x.Id');visual('@x.Id','canva_@x.Id')" style="cursor:pointer;">@fn</div>
+                            <div id="mymnu_@x.Id" class="vis">
+                                <a href="~/Home/PartsList?CNCID=@x.Id" class="l">Список деталей</a><br>
+                                <canvas id="canva_@x.Id" class="mycanva"></canvas>
+                            </div>
                         </td>
                         <td>@x.tickness</td>
                         <td>@x.Quantity</td>
@@ -104,41 +133,193 @@
                 }
             }
         }
+        @* --- Итоговая строка --- *@
         <tr>
-            @{var tsr = TimeSpan.FromSeconds((int)rtime * ktime); }
+            @{ var tsr = TimeSpan.FromSeconds((int)rtime * ktime); }
             <td>Всего</td>
             <td>@countall программ</td>
             <td></td>
-            <td> @countr в работе</td>
+            <td>@countr в работе</td>
             <td></td>
             <td>@(tsr.Days * 24 + tsr.Hours):@tsr.Minutes:@tsr.Seconds</td>
         </tr>
-
     </tbody>
 </table>
-<script>
-    window.addEventListener('load', function() {let timerId = setInterval(checkUpdate, 18000);})
-    // остановить вывод через 5 секунд
-    // Очистить проверку обновлений (когда есть подтверждение что информация устарела)
-    function checkUpdate()
-    {
 
+@* ==========================================================================
+   МОДАЛЬНОЕ ОКНО ЗАГРУЗКИ CNC-ФАЙЛОВ
+   Вместо перехода на новую страницу — всплывающее окно с прогресс-баром.
+   Использует Vue.js + axios для асинхронной загрузки.
+   ========================================================================== *@
+@if (((ViewBag.User.Privilegies & 32768) != 0))
+{
+    <div id="uploadModal" class="upload-modal-overlay" onclick="closeUploadModalBg(event)">
+        <div class="upload-modal-content" id="uploadApp">
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+            <h4>Загрузка CNC-программ</h4>
+
+            @* Прогресс-бар текущего файла *@
+            <div class="upload-progress" v-if="fileCurrent">
+                <div class="upload-progress-bar" :style="{width: fileProgress + '%'}"></div>
+            </div>
+            <p v-if="fileCurrent" style="font-size:12px; color:#888; margin:4px 0 10px;">
+                {{fileCurrent}} — {{fileProgress}}%
+            </p>
+
+            @* Область drag-and-drop *@
+            <div class="upload-dropzone"
+                 onclick="$refs.upload.click()"
+                 v-on:dragover.prevent="dragOver=true"
+                 v-on:dragleave="dragOver=false"
+                 v-on:drop.prevent="handleDrop"
+                 :class="{'dragover': dragOver}">
+                <div class="icon">&#128194;</div>
+                <p>Нажмите или перетащите CNC-файлы сюда</p>
+            </div>
+            <input ref="upload" type="file" name="uploadfile" multiple
+                   v-on:change="fileInputChange" style="display:none;" accept=".cnc,.CNC" />
+
+            @* Списки файлов *@
+            <div class="row" v-if="filesOrder.length + filesFinish.length > 0">
+                <div class="col-sm-6">
+                    <strong>В очереди ({{filesOrder.length}})</strong>
+                    <div class="upload-file-list">
+                        <div class="upload-file-item" v-for="file in filesOrder">
+                            <span>{{file.name}}</span>
+                            <span class="status-wait">ожидание</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <strong>Загружено ({{filesFinish.length}})</strong>
+                    <div class="upload-file-list">
+                        <div class="upload-file-item" v-for="file in filesFinish">
+                            <span>{{file.name}}</span>
+                            <span class="status-ok">&#10004;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Кнопка «Обновить страницу» после загрузки *@
+            <div style="text-align:center; margin-top:15px;" v-if="filesFinish.length > 0 && filesOrder.length === 0">
+                <button onclick="location.reload()">Обновить страницу</button>
+            </div>
+        </div>
+    </div>
+
+    @* Vue.js и axios для модального окна загрузки *@
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.js"></script>
+    <script>
+        /* URL-адреса для действий администратора */
+        var ld = '@Url.RouteUrl(new { controller = "adr", action = "DoneCNC", ID = " "})';
+        var lr = '@Url.RouteUrl(new { controller = "adr", action = "DelCNC", ID = " "})';
+        var uploadUrl = '@Url.RouteUrl(new { controller = "adr", action = "newCNC2" })';
+
+        /* Открытие модального окна загрузки */
+        function openUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+        }
+
+        /* Закрытие модального окна */
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+        }
+
+        /* Закрытие по клику на фон (вне контента) */
+        function closeUploadModalBg(event) {
+            if (event.target === document.getElementById('uploadModal')) {
+                closeUploadModal();
+            }
+        }
+
+        /* Vue-приложение для загрузки файлов */
+        var uploadApp = new Vue({
+            el: '#uploadApp',
+            data: function () {
+                return {
+                    filesOrder: [],    /* Файлы в очереди */
+                    filesFinish: [],   /* Загруженные файлы */
+                    fileProgress: 0,   /* Прогресс текущего файла (%) */
+                    fileCurrent: '',   /* Имя текущего загружаемого файла */
+                    dragOver: false    /* Флаг: мышь с файлами над зоной */
+                }
+            },
+            methods: {
+                /* Обработка выбора файлов через диалог */
+                async fileInputChange() {
+                    var files = Array.from(event.target.files);
+                    this.filesOrder = files.slice();
+                    this.$refs.upload.value = null;
+                    for (var i = 0; i < files.length; i++) {
+                        await this.uploadFile(files[i]);
+                    }
+                },
+                /* Обработка drag-and-drop */
+                async handleDrop(event) {
+                    this.dragOver = false;
+                    var files = Array.from(event.dataTransfer.files);
+                    this.filesOrder = files.slice();
+                    for (var i = 0; i < files.length; i++) {
+                        await this.uploadFile(files[i]);
+                    }
+                },
+                /* Загрузка одного файла на сервер */
+                async uploadFile(item) {
+                    var self = this;
+                    var form = new FormData();
+                    form.append('uploads', item);
+                    self.fileCurrent = item.name;
+                    try {
+                        await axios.post(uploadUrl, form, {
+                            onUploadProgress: function (e) {
+                                self.fileProgress = Math.round((e.loaded / e.total) * 100);
+                            }
+                        });
+                        self.fileCurrent = '';
+                        self.fileProgress = 0;
+                        self.filesFinish.push(item);
+                        /* Убрать файл из очереди */
+                        var idx = self.filesOrder.indexOf(item);
+                        if (idx >= 0) self.filesOrder.splice(idx, 1);
+                    } catch (error) {
+                        console.error('Ошибка загрузки файла:', error);
+                        self.fileCurrent = item.name + ' — ОШИБКА';
+                        self.fileProgress = 0;
+                    }
+                }
+            }
+        });
+    </script>
+    @Scripts.Render("~/Scripts/admtools.js")
+}
+
+@* --- Скрипты страницы --- *@
+<script>
+    /* Автообновление данных каждые 18 секунд */
+    window.addEventListener('load', function () {
+        var timerId = setInterval(checkUpdate, 18000);
+    });
+
+    /* Проверка обновлений таблицы CNCFILES */
+    function checkUpdate() {
         xmlRequest.open("POST", '@Url.RouteUrl(new { controller = "Home", action = "CheckUpdateTable", tablename = "CNCFILES" })');
         xmlRequest.onreadystatechange = checkupdaterequest;
         xmlRequest.send(null);
     }
-    function visual(cncid, canvaid) {
-    currentcanva = canvaid;
-    MyRequest('@Url.RouteUrl(new { controller = "Home", action = "getIMAGE", cncID = " "})' + cncid, readshowcnc);
-}
-    showOrHide("cb1");
 
+    /* Визуализация раскладки CNC-программы */
+    function visual(cncid, canvaid) {
+        currentcanva = canvaid;
+        MyRequest('@Url.RouteUrl(new { controller = "Home", action = "getIMAGE", cncID = " "})' + cncid, readshowcnc);
+    }
+
+    /* Сортировка таблицы по указанному столбцу */
+    function sortBy(col) {
+        document.location.replace('?SORT=' + col + '&psort=' + document.getElementById('sor').defaultValue + '&cb1=' + document.getElementById('cb1').checked);
+    }
+
+    /* Применить начальное состояние чекбоксов */
+    showOrHide("cb1");
 </script>
-@if ((ViewBag.User.Privilegies & 32768) != 0)
-{
-    <script>
-        var ld = '@Url.RouteUrl(new { controller = "adr", action = "DoneCNC", ID = " "})';
-        var lr = '@Url.RouteUrl(new { controller = "adr", action = "DelCNC", ID = " "})';
-    </script>
-    @Scripts.Render("~/Scripts/admtools.js")
-}

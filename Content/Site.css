@@ -1,54 +1,306 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-    /*
-    background-image: url("../img/12.jpg");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: right,bottom;
-    background-size: 100% auto;
-    */
+/* ============================================================================
+   Site.css — Основные стили приложения PLASMA
+   ============================================================================
+   Цветовая палитра: промышленная тема (тёмно-синий + оранжевый акцент)
+   - Основной фон:     #f4f6f9 (светло-серый)
+   - Навигация:         #1a2332 (тёмно-синий)
+   - Акцент:            #e67e22 (оранжевый)
+   - Успех/готово:       #27ae60 (зелёный)
+   - Текст:             #2c3e50 (тёмно-серый)
+   - Границы таблиц:    #dde1e6
+   ============================================================================ */
+
+/* === ОБЩИЕ СТИЛИ === */
+
+body {
+    padding-top: 52px;
+    padding-bottom: 60px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #2c3e50;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
-/* Set padding to keep content from hitting the edges */
+/* Контейнер основного контента */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
-.fh {
-    /* background-image: url("../img/1.jpg");*/
+
+/* Заголовки страниц */
+h4 {
+    color: #1a2332;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e67e22;
+    display: inline-block;
 }
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
-}
-fav
-/* Set width on the form input elements since they're 100% wide by default */
+
+/* Переопределение максимальной ширины полей ввода */
 input,
 select,
 textarea {
-    max-width: 280px;
-}
-table {
-    align-self: center;
-    justify-content: center;
-    width:100%;
-    border-spacing:20px;
-}
-tbody {
-    width :100%;
-    border-spacing: 20px;
-}
-.vis
-{
-    /*width:1200px;
-    height:720px;
-    */
-    display:none;
+    max-width: 320px;
 }
 
+/* Отступы для полей ввода и кнопок */
+input, select {
+    margin: 4px;
+}
+
+/* === НАВИГАЦИЯ === */
+
+/* Верхняя панель навигации */
+.navbar-inverse {
+    background-color: #1a2332;
+    border-color: #151d28;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-inverse .navbar-brand {
+    color: #e67e22;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+.navbar-inverse .navbar-brand:hover {
+    color: #f39c12;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+    color: #bdc3c7;
+    font-weight: 500;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    color: #fff;
+    background-color: rgba(230, 126, 34, 0.15);
+}
+
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover {
+    background-color: #e67e22;
+    color: #fff;
+}
+
+/* Выпадающее меню */
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: #253041;
+    color: #e67e22;
+}
+
+.dropdown-menu {
+    background-color: #253041;
+    border: 1px solid #344256;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu > li > a {
+    color: #bdc3c7;
+    padding: 8px 20px;
+    transition: background-color 0.2s;
+}
+
+.dropdown-menu > li > a:hover {
+    background-color: #e67e22;
+    color: #fff;
+}
+
+/* === ТАБЛИЦЫ === */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+thead {
+    background-color: #1a2332;
+    color: #fff;
+}
+
+thead th {
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid #e67e22;
+    white-space: nowrap;
+}
+
+tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eef0f3;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+tbody tr {
+    transition: background-color 0.15s;
+}
+
+/* Заголовки столбцов с сортировкой */
+.sorted {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 18px;
+}
+
+.sorted:hover {
+    background-color: #253041;
+}
+
+.sorted::after {
+    content: '⇅';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    opacity: 0.5;
+}
+
+/* --- Строки: незавершённые (в работе) --- */
+.alwaysshowrow_0 {
+    background-color: #ffffff;
+}
+
+.alwaysshowrow_1 {
+    background-color: #f9fafb;
+}
+
+tr.alwaysshowrow_0:hover,
+tr.alwaysshowrow_1:hover {
+    background-color: #fff8e1;
+}
+
+/* --- Строки: завершённые (скрытые по умолчанию) --- */
+.hiddenrow_0,
+.hiddenrow_1 {
+    display: none;
+}
+
+.hiddenrow_0 {
+    background-color: #f0f7f0;
+    color: #555;
+}
+
+.hiddenrow_1 {
+    background-color: #f5faf5;
+    color: #555;
+}
+
+tr.hiddenrow_0:hover,
+tr.hiddenrow_1:hover {
+    background-color: #fff8e1;
+    color: #2c3e50;
+}
+
+/* Итоговая строка таблицы */
+tbody tr:last-child td {
+    font-weight: 600;
+    border-top: 2px solid #dde1e6;
+}
+
+/* === КНОПКИ === */
+
+input[type="submit"],
+button {
+    background-color: #e67e22;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    max-width: none;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: #d35400;
+    box-shadow: 0 2px 6px rgba(211, 84, 0, 0.3);
+}
+
+/* === ПОЛЯ ВВОДА === */
+
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select {
+    border: 1px solid #ccd1d9;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+    border-color: #e67e22;
+    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.15);
+    outline: none;
+}
+
+/* Поле быстрого поиска */
+#myInput {
+    max-width: 100%;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccd1d9;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#myInput:focus {
+    border-color: #e67e22;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+}
+
+/* === ЧЕКБОКСЫ И ФИЛЬТРЫ === */
+
+.over-table {
+    margin-bottom: 12px;
+    padding: 10px 0;
+}
+
+/* Область фильтра */
+.filtermnu {
+    background-color: #fff;
+    border: 1px solid #dde1e6;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* === ВИЗУАЛИЗАЦИЯ CNC (Canvas/SVG) === */
+
+/* Скрытый блок с подробностями программы */
+.vis {
+    display: none;
+}
+
+/* Canvas для отрисовки CNC-раскладки */
 canvas {
     width: 600px;
     height: 200px;
@@ -56,54 +308,379 @@ canvas {
 }
 
 .mycanva {
-    width: 630px;
+    width: 100%;
+    max-width: 630px;
     height: 220px;
     display: none;
-    
+    border: 1px solid #dde1e6;
+    border-radius: 4px;
+    background-color: #fafbfc;
 }
-.back-to-top {
-    position: fixed;
-    right: 10px;
-    bottom: 100px;
-    width: 50px;
-    height: 50px;
-    border-color: transparent;
-    border-radius: 50px;
-    background-color: gray;
-    display: none;
-}
-#Currenttime {
-    justify-content:right;
-}
-#ncinfo p {
-    line-height: 50%;
-}
-input, select {
-    margin: 4px
-}
-#bottomlogo {
-    color: white;
-    padding: 0px;
-    margin-top: 15px;
-}
+
+/* SVG-стили для отрисовки контуров деталей */
 svg {
     stroke-width: 1.2;
-    stroke: green;
+    stroke: #2980b9;
     stroke-linecap: round;
     stroke-linejoin: round;
-    fill-rule: none-zero;
-    fill: Yellow;
-    fill-opasity: 0.2;
+    fill-rule: nonzero;
+    fill: #fffde7;
+    fill-opacity: 0.2;
 }
+
+/* === МОДАЛЬНЫЕ ОКНА === */
+
+/* Фон модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+/* Контент модального окна */
+.modal-content {
+    background-color: #fff;
+    margin: 60px auto;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    animation: modalSlideIn 0.25s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Кнопка закрытия модального окна */
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close:hover {
+    color: #e74c3c;
+}
+
+/* Форма внутри модального окна */
 .modalsheet {
-    margin-left:30px;
-    margin-top:50px;
+    margin-left: 0;
+    margin-top: 0;
 }
+
 .formEditSheetArrival {
-    margin-left:25px;
+    margin-left: 0;
 }
+
+.formEditSheetArrival h4 {
+    border-bottom: none;
+    display: block;
+}
+
+/* === МОДАЛЬНОЕ ОКНО ЗАГРУЗКИ ФАЙЛОВ === */
+
+.upload-modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.upload-modal-content {
+    background-color: #fff;
+    margin: 80px auto;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    max-width: 650px;
+    width: 90%;
+    position: relative;
+    animation: modalSlideIn 0.25s ease-out;
+}
+
+.upload-modal-content h4 {
+    border-bottom: 2px solid #e67e22;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+/* Область drag-and-drop для загрузки */
+.upload-dropzone {
+    border: 2px dashed #ccd1d9;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+    margin-bottom: 15px;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.dragover {
+    border-color: #e67e22;
+    background-color: #fff8f0;
+}
+
+.upload-dropzone p {
+    margin: 0;
+    color: #888;
+    font-size: 14px;
+}
+
+.upload-dropzone .icon {
+    font-size: 36px;
+    color: #ccc;
+    margin-bottom: 8px;
+}
+
+/* Прогресс-бар загрузки */
+.upload-progress {
+    height: 6px;
+    background-color: #eef0f3;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    background-color: #e67e22;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* Список файлов в очереди/загруженных */
+.upload-file-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+.upload-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eef0f3;
+    font-size: 13px;
+}
+
+.upload-file-item .status-ok {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.upload-file-item .status-wait {
+    color: #999;
+}
+
+.upload-file-item .status-error {
+    color: #e74c3c;
+}
+
+/* Кнопка открытия модального окна загрузки */
+.btn-upload {
+    background-color: #27ae60;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    max-width: none;
+}
+
+.btn-upload:hover {
+    background-color: #219a52;
+}
+
+/* === ФУТЕР === */
+
+.navbar-fixed-bottom {
+    background-color: #1a2332;
+    border: none;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
+    min-height: 40px;
+}
+
+#bottomlogo {
+    color: #7f8c8d;
+    padding: 0;
+    margin-top: 12px;
+    font-size: 12px;
+}
+
+/* === УВЕДОМЛЕНИЕ ОБ ОБНОВЛЕНИИ === */
+
+#PleaceUpdate {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #ffeaa7;
+    font-size: 13px;
+}
+
+#Currenttime {
+    text-align: right;
+    color: #999;
+    font-size: 12px;
+}
+
+/* === ССЫЛКИ === */
+
+a {
+    color: #2980b9;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #e67e22;
+    text-decoration: none;
+}
+
 a.Aboutlink {
     font-weight: 800;
     font-size: 13px;
-    text-shadow: 2px 2px 3px lightblue;
+    color: #1a2332;
+}
+
+/* === КНОПКА «НАВЕРХ» === */
+
+.back-to-top {
+    position: fixed;
+    right: 15px;
+    bottom: 70px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background-color: #e67e22;
+    color: #fff;
+    display: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s;
+    z-index: 900;
+    text-align: center;
+    line-height: 44px;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+.back-to-top:hover {
+    background-color: #d35400;
+    text-decoration: none;
+    color: #fff;
+}
+
+/* === ИНФОРМАЦИЯ О РАСКЛАДКЕ (#ncinfo) === */
+
+#ncinfo p {
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+/* === АДАПТИВНОСТЬ === */
+
+@media (max-width: 768px) {
+    body {
+        font-size: 13px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    thead th {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
+    tbody td {
+        padding: 6px;
+    }
+
+    .mycanva {
+        width: 100%;
+        height: 160px;
+    }
+
+    .modal-content,
+    .upload-modal-content {
+        margin: 20px auto;
+        padding: 15px 20px;
+        width: 95%;
+    }
+
+    h4 {
+        font-size: 16px;
+    }
+}
+
+/* === СТИЛИ ДЛЯ СТРАНИЦЫ ПИЛЫ (CutSaw) === */
+
+.list-group-item {
+    padding: 5px 7px;
+}
+
+.mg-5 {
+    margin: 5px;
+    width: 200px;
+}
+
+.lenlist {
+    margin: 5px;
+    width: 217px;
+    height: 320px;
+    overflow-y: scroll;
+}
+
+.numInput {
+    margin: 5px;
+    width: 6em;
+}
+
+.qtyInput {
+    margin: 5px;
+    width: 4em;
+}
+
+.CutSaw td {
+    padding: 0 15px 0 15px;
+    font-size: 1.2em;
+}
+
+.lineHead {
+    font-size: 1em;
+    padding: 10px 5px;
 }

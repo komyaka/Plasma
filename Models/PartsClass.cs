@@ -189,7 +189,7 @@ namespace Plazma.Controllers
         public List<_Shipment> Shipments = new List<_Shipment> { };
         public List<Chapter> chapters = new List<Chapter> { };
         public Dictionary<string,int> Dchapters = new Dictionary<string, int> { };
-        public void showError(Exception e) { }
+        public void showError(Exception e) { Logger.Error("PartsClass error", e); }  // ИСПРАВЛЕНО: логирование ошибок
         public int getChapterCode(string _Name)
         {
             int id = Math.Abs(chapters.FindIndex(X => X.Name.Trim().ToUpper() == _Name.Trim().ToUpper()));
@@ -715,9 +715,11 @@ namespace Plazma.Controllers
             OnePart.Reserve3 = Reserve3;
             _InsertParts(OnePart);
         }
+        // ИСПРАВЛЕНО: логирование + убрана повторная попытка выполнения при ошибке
         public int FreeRequestToBD(string request)
         {
             int qty = 0;
+            Logger.Sql(request);
             if (sqlconnection.State != System.Data.ConnectionState.Open) ConnectDB();
             SqlCommand command1 = new SqlCommand(request, sqlconnection);
             try
@@ -726,13 +728,7 @@ namespace Plazma.Controllers
             }
             catch (Exception e)
             {
-                try
-                {
-                    Console.WriteLine(e.Message);
-                    command1.ExecuteNonQuery();
-                }
-                catch (Exception e1) { Console.WriteLine(e1); }
-
+                Logger.Error("FreeRequestToBD failed: " + request, e);
             }
             CloseSqlConnection();
             return qty;
@@ -873,13 +869,15 @@ namespace Plazma.Controllers
             ReadParts();
             CloseSqlConnection();
         }
+        // ИСПРАВЛЕНО: TableReader использовался до ExecuteReader
         public void DeleteCNC(int ID)
         {
             if (sqlconnection.State != System.Data.ConnectionState.Open) ConnectDB();
             string fname = "";
             SqlDataReader TableReader = null;
             SqlCommand command1 = new SqlCommand("Select ORIGINALFILENAME FROM CNCFILES WHERE ID=" + ID.ToString(), sqlconnection);
-            try { fname = Convert.ToString(TableReader["ORIGINALFILENAME"] == DBNull.Value ? "UNCNOVNFILE" : TableReader["ORIGINALFILENAME"]); } catch { fname = ""; }
+            try { TableReader = command1.ExecuteReader(); if (TableReader.Read()) fname = Convert.ToString(TableReader["ORIGINALFILENAME"] == DBNull.Value ? "" : TableReader["ORIGINALFILENAME"]); } catch { fname = ""; }
+            if (TableReader != null) TableReader.Close();
             if (fname.Length > 5) File.Delete(fname);
 
             command1 = new SqlCommand("DELETE FROM CNCFILES WHERE ID=" + ID.ToString(), sqlconnection);

@@ -112,7 +112,7 @@ namespace Plazma.Controllers
             {
                 ViewBag.Message = "Установка статуса программы";
                 int Index = partsClass.CNCs.FindIndex(x => x.Id == ID);
-                if (Index > 0) { ViewBag.CNC = partsClass.CNCs[Index]; ViewBag.found = true; } else { ViewBag.found = false; }
+                if (Index >= 0) { ViewBag.CNC = partsClass.CNCs[Index]; ViewBag.found = true; }  // ИСПРАВЛЕНО: >= 0, т.к. FindIndex возвращает 0 для первого элемента else { ViewBag.found = false; }
 
                 return View();
             }
@@ -155,11 +155,11 @@ namespace Plazma.Controllers
             string qwestion = "SELECT [MATHERIAL],[TICKNESS],[WIDTH],[HEIGTH],sum([QUANTITY]) as Quantity,[DOKUMENT],[DATE],[OWNER] FROM [PLASMA].[dbo].[SHEETS] where [TICKNESS]>0";
             if (tickness > 0) qwestion += " and TICKNESS=" + tickness.ToString();
             if (material > 0) qwestion += " and MATHERIAL=" + material.ToString();
-            if (datestart.Length > 0) qwestion += "AND DATE>" + datestart;
-            if (dateend.Length > 0) qwestion += "AND DATE<" + dateend;
-            if (Document.Length > 0) qwestion += "AND DOKUMENT like '%" + Document + "%'";
-            if (Width > 0) qwestion += "AND WIDTH=" + Width.ToString();
-            if (Heigth > 0) qwestion += "AND HEIGTH=" + Heigth.ToString();
+            if (datestart.Length > 0) qwestion += " AND DATE>'" + datestart + "'";  // ИСПРАВЛЕНО: пробел перед AND + кавычки
+            if (dateend.Length > 0) qwestion += " AND DATE<'" + dateend + "'";  // ИСПРАВЛЕНО: пробел перед AND + кавычки
+            if (Document.Length > 0) qwestion += " AND DOKUMENT like '%" + Document + "%'";  // ИСПРАВЛЕНО: пробел перед AND
+            if (Width > 0) qwestion += " AND WIDTH=" + Width.ToString();
+            if (Heigth > 0) qwestion += " AND HEIGTH=" + Heigth.ToString();
             qwestion += "group by [OWNER], DOKUMENT,[DATE],MATHERIAL,TICKNESS,WIDTH,HEIGTH "; // ORDER BY DATE DESC,MATHERIAL,TICKNESS,HEIGTH,WIDTH,DOKUMENT ";
             if (sort == "DATE") qwestion += " Order by DATE DESC";
             else if (sort == "QTY") qwestion += " Order by Quantity";

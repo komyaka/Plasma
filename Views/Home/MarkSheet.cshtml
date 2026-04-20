@@ -88,7 +88,7 @@
                         <td>@x.Quantity</td>
                         <td>@for(int i=x.Quantity;i>0;i--){
                             <a  id="Cell_@x.Id-@i"> </a>
-                            <select id="sizesel_@x.Id-@i" name="Size" onchange="Seleсtfield" class="cnc_sheet">
+                            <select id="sizesel_@x.Id-@i" name="Size" onchange="SelectField()" class="cnc_sheet">
                                 <option value='@x.Id:-1'>Не отмечать</option>
                                 <option value='@x.Id:-7'>Программа без листа</option>
                                 @{ 
@@ -132,7 +132,7 @@
             console.log(e);
         }
     }
-    Seleсtfield()
+    function SelectField()
     {
         // Здесь разместить код  если выбран какой либо ID  то нужно скрыть все остальные options  с этим id
         // но пока не понятно как сделать  deselect ( показать все options если снят выбор )
